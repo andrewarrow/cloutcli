@@ -5,7 +5,6 @@ import (
 	"math/rand"
 	"os"
 	"time"
-	//	"github.com/andrewarrow/cloutcli"
 )
 
 func PrintHelp() {

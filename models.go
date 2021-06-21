@@ -39,3 +39,7 @@ type CoinEntry struct {
 	CoinsInCirculationNanos int64
 	CoinWatermarkNanos      int64
 }
+
+type SingleProfile struct {
+	Profile ProfileEntryResponse
+}

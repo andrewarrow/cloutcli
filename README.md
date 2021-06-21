@@ -20,7 +20,7 @@ and then:
 list := cloutcli.GlobalPosts()
 
 for _, post := range list {
-        fmt.Println(post.Body)
+  fmt.Println(post.Body)
 }
 ```
 
