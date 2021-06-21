@@ -2,17 +2,31 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/andrewarrow/cloutcli"
+	"math/rand"
+	"os"
+	"time"
+	//	"github.com/andrewarrow/cloutcli"
 )
 
+func PrintHelp() {
+	fmt.Println("")
+	fmt.Println("  clout accounts               # list your various accounts")
+	fmt.Println("  clout ls                     # list global posts")
+	fmt.Println("")
+}
+
 func main() {
-	fmt.Println("list messages from the global feed...")
+	rand.Seed(time.Now().UnixNano())
 
-	list := cloutcli.GlobalPosts()
+	if len(os.Args) == 1 {
+		PrintHelp()
+		return
+	}
+	command := os.Args[1]
 
-	for _, post := range list {
-		fmt.Println(post.Body)
+	if command == "account" || command == "accounts" {
+	} else if command == "ls" {
+		HandleLs()
 	}
 
 }
