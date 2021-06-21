@@ -1,0 +1,3 @@
+package cloutcli
+
+var DefaultPublicKey = "BC1YLgw3KMdQav8w5juVRc3Ko5gzNJ7NzBHE1FfyYWGwpBEQEmnKG2v"

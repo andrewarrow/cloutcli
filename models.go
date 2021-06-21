@@ -1,5 +1,9 @@
 package cloutcli
 
+type PostsStateless struct {
+	PostsFound []Post
+}
+
 type Post struct {
 	PostHashHex                string
 	PosterPublicKeyBase58Check string
