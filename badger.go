@@ -17,6 +17,21 @@ func ImportFromBadgerToSqlite(dir string) error {
 		return err
 	}
 	defer db.Close()
+	postEntryChan := make(chan *lib.PostEntry, 1024)
+	go database.EnumeratePosts(db, &postEntryChan)
+
+	sdb := database.OpenSqliteDB()
+	database.CreateSchema(sdb)
+	defer sdb.Close()
+
+	i := 0
+	for postEntry := range postEntryChan {
+		database.InsertPostSqlite(sdb, postEntry)
+		i++
+		if i%1000 == 0 {
+			fmt.Println("iteration", i)
+		}
+	}
 	return nil
 }
 
