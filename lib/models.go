@@ -1,4 +1,4 @@
-package cloutcli
+package lib
 
 type PostsStateless struct {
 	PostsFound []Post

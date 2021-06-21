@@ -1,4 +1,4 @@
-package cloutcli
+package lib
 
 type StakeEntryStats struct {
 }
