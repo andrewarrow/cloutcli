@@ -23,7 +23,7 @@ func HandleSqlite() {
 	command := os.Args[2]
 	if command == "fill" {
 		dir := DirCheck()
-		cloutcli.Testing = true
+		//cloutcli.Testing = true
 		cloutcli.ImportFromBadgerToSqlite(dir)
 	} else if command == "query" {
 		term := argMap["term"]
