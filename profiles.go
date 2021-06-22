@@ -13,3 +13,10 @@ func UsernameToPub58(s string) string {
 	json.Unmarshal([]byte(js), &sp)
 	return sp.Profile.PublicKeyBase58Check
 }
+
+func Pub58ToUser(key string) lib.User {
+	js := network.GetUsersStateless(key)
+	var us lib.UsersStateless
+	json.Unmarshal([]byte(js), &us)
+	return us.UserList[0]
+}

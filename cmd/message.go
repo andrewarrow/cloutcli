@@ -47,7 +47,11 @@ func MessageBulk() {
 
 	bulkList := []string{}
 	if to == "allfollowers" {
-		bulkList = cloutcli.LoadFollowers(pub58)
+		me := cloutcli.Pub58ToUser(pub58)
+		items := cloutcli.LoopThruAllFollowing(pub58, me.ProfileEntryResponse.Username, 100)
+		for _, item := range items {
+			bulkList = append(bulkList, item.Username)
+		}
 	}
 
 	if text == "" {
@@ -55,6 +59,10 @@ func MessageBulk() {
 	}
 
 	for _, username := range bulkList {
+		if argMap["dryrun"] != "" {
+			fmt.Println(username)
+			continue
+		}
 		argMap["to"] = username
 		argMap["text"] = text
 		MessageNew()

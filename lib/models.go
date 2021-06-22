@@ -74,3 +74,25 @@ type Message struct {
 	TstampNanos                   int64
 	IsSender                      bool
 }
+
+type PublicKeyToProfileEntry struct {
+	PublicKeyToProfileEntry map[string]ProfileEntryResponse
+	NumFollowers            int64
+}
+
+type UsersStateless struct {
+	UserList []User
+}
+
+type User struct {
+	PublicKeyBase58Check string
+	ProfileEntryResponse ProfileEntryResponse
+	BalanceNanos         int64
+	UsersYouHODL         []HODLerThing
+}
+type HODLerThing struct {
+	HODLerPublicKeyBase58Check  string
+	CreatorPublicKeyBase58Check string
+	BalanceNanos                int64
+	ProfileEntryResponse        ProfileEntryResponse
+}
