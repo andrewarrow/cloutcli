@@ -9,3 +9,10 @@ func GetMessagesStateless(pub58 string) string {
 		[]byte(sendString))
 	return jsonString
 }
+func SendMessage(sender, recipient, body string) string {
+	jsonString := `{"SenderPublicKeyBase58Check":"%s","RecipientPublicKeyBase58Check":"%s","MessageText":"%s","MinFeeRateNanosPerKB":1000}`
+	send := fmt.Sprintf(jsonString, sender, recipient, body)
+	jsonString = DoPost("api/v0/send-message-stateless",
+		[]byte(send))
+	return jsonString
+}
