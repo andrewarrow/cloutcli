@@ -24,6 +24,8 @@ func HandleSqlite() {
 	if command == "fill" {
 		dir := DirCheck()
 		cloutcli.ImportFromBadgerToSqlite(dir)
+	} else if command == "query" {
+		cloutcli.QuerySqlitePosts(argMap["term"])
 	}
 }
 

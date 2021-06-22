@@ -8,6 +8,25 @@ import (
 	"github.com/dgraph-io/badger/v3"
 )
 
+func EnumerateProfiles(db *badger.DB, c *chan *lib.ProfileEntry) {
+
+	db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		nodeIterator := txn.NewIterator(opts)
+		defer nodeIterator.Close()
+		prefix := []byte{23}
+
+		for nodeIterator.Seek(prefix); nodeIterator.ValidForPrefix(prefix); nodeIterator.Next() {
+			val, _ := nodeIterator.Item().ValueCopy(nil)
+
+			profile := &lib.ProfileEntry{}
+			gob.NewDecoder(bytes.NewReader(val)).Decode(profile)
+			*c <- profile
+		}
+		return nil
+	})
+
+}
 func LookupUsername(db *badger.DB, pkid []byte) string {
 
 	username := ""
