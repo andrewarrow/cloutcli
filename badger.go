@@ -29,6 +29,7 @@ func ImportFromBadgerToSqlite(dir string) error {
 		if entry.Flavor == "post" {
 			database.InsertPostSqlite(sdb, entry.Thing.(*lib.PostEntry))
 		} else if entry.Flavor == "profile" {
+			database.InsertProfileSqlite(sdb, entry.Thing.(*lib.ProfileEntry))
 		}
 		i++
 		if i%1000 == 0 {
