@@ -29,10 +29,17 @@ func HandleSqlite() {
 		term := argMap["term"]
 		table := argMap["table"]
 
+		degrees := argMap["degrees"]
+		if degrees == "" {
+			degrees = "2"
+		}
+
 		if table == "" {
 			cloutcli.QuerySqlitePosts(term)
 		} else if table == "users" {
 			cloutcli.QuerySqliteUsers(term)
+		} else if table == "follow" {
+			cloutcli.QuerySqliteFollow("", term, degrees)
 		}
 	}
 }

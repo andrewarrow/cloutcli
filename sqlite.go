@@ -2,6 +2,7 @@ package cloutcli
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/andrewarrow/cloutcli/database"
 )
@@ -39,4 +40,65 @@ func QuerySqliteUsers(s string) {
 		rows.Scan(&username, &bio)
 		fmt.Println(username, bio)
 	}
+}
+func QuerySqliteFollow(tab, s, degrees string) {
+	pub58 := SearchSqliteUsername(s)
+	db := database.OpenSqliteDB()
+	defer db.Close()
+	rows, err := db.Query("select follower from user_follower where followee = '" + pub58 + "'")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer rows.Close()
+
+	limit, _ := strconv.Atoi(degrees)
+	tabSize := len(tab) / 2
+
+	for rows.Next() {
+		var follower string
+		rows.Scan(&follower)
+		username := SearchSqlitePub58(follower)
+		fmt.Printf("%s%s\n", tab, username)
+
+		if tabSize+1 < limit {
+			QuerySqliteFollow(tab+"  ", username, degrees)
+		}
+	}
+}
+func SearchSqliteUsername(s string) string {
+	db := database.OpenSqliteDB()
+	defer db.Close()
+	rows, err := db.Query("select pub58 from users where username='" + s + "'")
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var pub58 string
+		rows.Scan(&pub58)
+		return pub58
+	}
+
+	return ""
+}
+func SearchSqlitePub58(s string) string {
+	db := database.OpenSqliteDB()
+	defer db.Close()
+	rows, err := db.Query("select username from users where pub58='" + s + "'")
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var username string
+		rows.Scan(&username)
+		return username
+	}
+
+	return ""
 }
