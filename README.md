@@ -4,7 +4,13 @@ library to make building things with bitclout easy
 # building the "clout" executable
 There is no main.go file in the root directory.
 
-Instead go into "cmd" directory and `go build` there.
+Instead cd to the "cmd" directory and run:
+
+```
+go mod download
+go build
+./clout
+```
 
 This is done to keep the root directory having the package name "cloutcli".
 
