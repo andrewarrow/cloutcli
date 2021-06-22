@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func PrintMessageHelp() {
 	fmt.Println("")
@@ -12,5 +15,20 @@ func PrintMessageHelp() {
 	fmt.Println("")
 }
 func HandleMessage() {
-	PrintMessageHelp()
+	if len(os.Args) < 3 {
+		PrintMessageHelp()
+		return
+	}
+	command := os.Args[2]
+	if command == "inbox" {
+		MessageInbox()
+	}
+}
+
+func MessageInbox() {
+	username := os.Getenv("CLOUTCLI_USERNAME")
+	if username == "" {
+		fmt.Println("set CLOUTCLI_USERNAME")
+		return
+	}
 }

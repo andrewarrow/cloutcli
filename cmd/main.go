@@ -9,7 +9,7 @@ import (
 
 func PrintHelp() {
 	fmt.Println("")
-	fmt.Println("  clout accounts              # list your various accounts")
+	fmt.Println("  clout account               # list your various accounts")
 	fmt.Println("  clout message               # send, send bulk, read")
 	fmt.Println("  clout ls                    # list global posts")
 	fmt.Println("")
