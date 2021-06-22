@@ -34,9 +34,9 @@ func HandleSqlite() {
 			degrees = "2"
 		}
 
-		if table == "" {
+		if table == "" || table == "posts" || table == "post" {
 			cloutcli.QuerySqlitePosts(term)
-		} else if table == "users" {
+		} else if table == "users" || table == "user" {
 			cloutcli.QuerySqliteUsers(term)
 		} else if table == "follow" {
 			cloutcli.QuerySqliteFollow("", term, degrees)
