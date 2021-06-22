@@ -36,9 +36,8 @@ func HandleMessage() {
 }
 
 func MessageBulk() {
-	words := os.Getenv("CLOUTCLI_SEED_WORDS")
+	words := WarnAboutWords()
 	if words == "" {
-		fmt.Println("set CLOUTCLI_SEED_WORDS")
 		return
 	}
 	pub58, _ := keys.ComputeKeysFromSeed(words)
@@ -70,9 +69,8 @@ func MessageBulk() {
 }
 
 func MessageNew() {
-	words := os.Getenv("CLOUTCLI_SEED_WORDS")
+	words := WarnAboutWords()
 	if words == "" {
-		fmt.Println("set CLOUTCLI_SEED_WORDS")
 		return
 	}
 	to := argMap["to"]
