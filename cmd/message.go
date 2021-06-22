@@ -45,6 +45,10 @@ func MessageBulk() {
 	to := argMap["to"]
 	text := argMap["text"]
 
+	if text == "" {
+		text = files.ReadFromIn()
+	}
+
 	bulkList := []string{}
 	if to == "allfollowers" {
 		me := cloutcli.Pub58ToUser(pub58)
@@ -52,10 +56,6 @@ func MessageBulk() {
 		for _, item := range items {
 			bulkList = append(bulkList, item.Username)
 		}
-	}
-
-	if text == "" {
-		text = files.ReadFromIn()
 	}
 
 	for _, username := range bulkList {
