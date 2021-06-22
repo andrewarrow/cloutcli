@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/andrewarrow/cloutcli"
+	"github.com/andrewarrow/cloutcli/keys"
 	"github.com/justincampbell/timeago"
 )
 
@@ -29,6 +30,34 @@ func HandleMessage() {
 		MessageInbox()
 	} else if command == "new" {
 		MessageNew()
+	} else if command == "bulk" {
+		MessageBulk()
+	}
+}
+
+func MessageBulk() {
+	words := os.Getenv("CLOUTCLI_SEED_WORDS")
+	if words == "" {
+		fmt.Println("set CLOUTCLI_SEED_WORDS")
+		return
+	}
+	pub58, _ := keys.ComputeKeysFromSeed(words)
+	to := argMap["to"]
+	text := argMap["text"]
+
+	bulkList := []string{}
+	if to == "allfollowers" {
+		bulkList = cloutcli.LoadFollowers(pub58)
+	}
+
+	if text == "" {
+		text = files.ReadFromIn()
+	}
+
+	for _, username := range bulkList {
+		argMap["to"] = username
+		argMap["text"] = text
+		MessageNew()
 	}
 }
 
@@ -45,7 +74,8 @@ func MessageNew() {
 		text = files.ReadFromIn()
 	}
 
-	cloutcli.SendMessage(words, to, text)
+	ok := cloutcli.SendMessage(words, to, text)
+	fmt.Println(to, ok)
 }
 
 func MessageInbox() {
