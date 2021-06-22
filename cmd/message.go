@@ -48,7 +48,7 @@ func MessageBulk() {
 	bulkList := []string{}
 	if to == "allfollowers" {
 		me := cloutcli.Pub58ToUser(pub58)
-		items := cloutcli.LoopThruAllFollowing(pub58, me.ProfileEntryResponse.Username, 100)
+		items := cloutcli.LoopThruAllFollowing(pub58, me.ProfileEntryResponse.Username, 0)
 		for _, item := range items {
 			bulkList = append(bulkList, item.Username)
 		}
