@@ -26,7 +26,14 @@ func HandleSqlite() {
 		cloutcli.Testing = true
 		cloutcli.ImportFromBadgerToSqlite(dir)
 	} else if command == "query" {
-		cloutcli.QuerySqlitePosts(argMap["term"])
+		term := argMap["term"]
+		table := argMap["table"]
+
+		if table == "" {
+			cloutcli.QuerySqlitePosts(term)
+		} else if table == "users" {
+			cloutcli.QuerySqliteUsers(term)
+		}
 	}
 }
 
