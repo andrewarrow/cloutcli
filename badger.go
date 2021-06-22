@@ -11,6 +11,8 @@ import (
 // magic numbers are defined in
 // https://github.com/bitclout/core/blob/main/lib/db_utils.go
 
+var Testing bool
+
 func ImportFromBadgerToSqlite(dir string) error {
 	db, err := badger.Open(badger.DefaultOptions(dir))
 	if err != nil {
@@ -18,7 +20,7 @@ func ImportFromBadgerToSqlite(dir string) error {
 	}
 	defer db.Close()
 	entryChan := make(chan database.EntryHolder, 1024)
-	go database.EnumerateAll(db, &entryChan)
+	go database.EnumerateAll(Testing, db, &entryChan)
 
 	sdb := database.OpenSqliteDB()
 	database.CreateSchema(sdb)
@@ -30,6 +32,8 @@ func ImportFromBadgerToSqlite(dir string) error {
 			database.InsertPostSqlite(sdb, entry.Thing.(*lib.PostEntry))
 		} else if entry.Flavor == "profile" {
 			database.InsertProfileSqlite(sdb, entry.Thing.(*lib.ProfileEntry))
+		} else if entry.Flavor == "done" {
+			break
 		}
 		i++
 		if i%1000 == 0 {

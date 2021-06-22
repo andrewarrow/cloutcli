@@ -33,11 +33,11 @@ type ProfileEntryResponse struct {
 }
 
 type CoinEntry struct {
-	CreatorBasisPoints      int64
-	BitCloutLockedNanos     int64
-	NumberOfHolders         int64
-	CoinsInCirculationNanos int64
-	CoinWatermarkNanos      int64
+	CreatorBasisPoints      uint64
+	BitCloutLockedNanos     uint64
+	NumberOfHolders         uint64
+	CoinsInCirculationNanos uint64
+	CoinWatermarkNanos      uint64
 }
 
 type SingleProfile struct {
