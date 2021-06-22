@@ -5,6 +5,7 @@ import (
 
 	"github.com/andrewarrow/cloutcli/database"
 	"github.com/andrewarrow/cloutcli/lib"
+	"github.com/btcsuite/btcutil/base58"
 	"github.com/dgraph-io/badger/v3"
 )
 
@@ -32,6 +33,9 @@ func ImportFromBadgerToSqlite(dir string) error {
 			database.InsertPostSqlite(sdb, entry.Thing.(*lib.PostEntry))
 		} else if entry.Flavor == "profile" {
 			database.InsertProfileSqlite(sdb, entry.Thing.(*lib.ProfileEntry))
+		} else if entry.Flavor == "follow" {
+			database.InsertFollowee(sdb, base58.Encode(entry.Followed),
+				base58.Encode(entry.Follower))
 		} else if entry.Flavor == "done" {
 			break
 		}

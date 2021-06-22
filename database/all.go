@@ -10,8 +10,10 @@ import (
 )
 
 type EntryHolder struct {
-	Flavor string
-	Thing  interface{}
+	Flavor   string
+	Thing    interface{}
+	Follower []byte
+	Followed []byte
 }
 
 func EnumerateAll(testing bool, db *badger.DB, c *chan EntryHolder) {
@@ -26,7 +28,7 @@ func EnumerateAll(testing bool, db *badger.DB, c *chan EntryHolder) {
 			key := nodeIterator.Item().Key()
 			keyPrefix := fmt.Sprintf("%d", key[0])
 
-			if keyPrefix != "17" && keyPrefix != "23" {
+			if keyPrefix != "17" && keyPrefix != "23" && keyPrefix != "29" {
 				continue
 			}
 
@@ -48,6 +50,15 @@ func EnumerateAll(testing bool, db *badger.DB, c *chan EntryHolder) {
 				gob.NewDecoder(bytes.NewReader(val)).Decode(profile)
 				holder.Flavor = "profile"
 				holder.Thing = profile
+			} else if keyPrefix == "29" {
+				if testing && flavorMap["follow"] > 1000 {
+					continue
+				}
+				follower := key[1:34]
+				followed := key[34:]
+				holder.Flavor = "follow"
+				holder.Follower = follower
+				holder.Followed = followed
 			}
 			*c <- holder
 			flavorMap[holder.Flavor]++
