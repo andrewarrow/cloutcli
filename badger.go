@@ -49,9 +49,6 @@ func ImportFromBadgerToSqlite(dir string) error {
 		if i%1000 == 0 {
 			fmt.Println("iteration", i, entry.Flavor)
 		}
-		if okList[entry.Flavor] == false {
-			continue
-		}
 		if entry.Flavor == "diamond" {
 			database.InsertDiamondSqlite(sdb, entry.Thing.(*lib.DiamondEntry))
 		} else if entry.Flavor == "follow" {

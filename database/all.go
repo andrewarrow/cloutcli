@@ -38,6 +38,7 @@ func EnumeratePrefix(flavor string, prefix []byte, testing bool, db *badger.DB, 
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
 		nodeIterator := txn.NewIterator(opts)
+		defer nodeIterator.Close()
 
 		i := 0
 		for nodeIterator.Seek(prefix); nodeIterator.ValidForPrefix(prefix); nodeIterator.Next() {
@@ -78,11 +79,10 @@ func EnumeratePrefix(flavor string, prefix []byte, testing bool, db *badger.DB, 
 				holder.Thing = de
 			}
 			if testing && i > 1000 {
-				continue
+				break
 			}
 			*c <- holder
 		}
-		nodeIterator.Close()
 		return nil
 	})
 
