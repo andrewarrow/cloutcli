@@ -29,26 +29,39 @@ func ImportFromBadgerToSqlite(dir string) error {
 	database.CreateSchema(sdb)
 	defer sdb.Close()
 
-	skipList := map[string]bool{}
-	for _, item := range strings.Split(Tables, ",") {
-		skipList[item] = true
+	okList := map[string]bool{"diamond": true,
+		"follow":  true,
+		"post":    true,
+		"profile": true}
+	if Tables != "" {
+		okList = map[string]bool{}
+		for _, item := range strings.Split(Tables, ",") {
+			okList[item] = true
+		}
 	}
+	okList["done"] = true
+	fmt.Println(okList)
 
 	i := 0
 	for entry := range entryChan {
-		if entry.Flavor == "post" && !skipList["post"] {
-			database.InsertPostSqlite(sdb, entry.Thing.(*lib.PostEntry))
-		} else if entry.Flavor == "profile" && !skipList["profile"] {
-			database.InsertProfileSqlite(sdb, entry.Thing.(*lib.ProfileEntry))
-		} else if entry.Flavor == "follow" && !skipList["follow"] {
-			database.InsertFollowee(sdb, base58.Encode(entry.Followed),
-				base58.Encode(entry.Follower))
-		} else if entry.Flavor == "done" {
-			break
-		}
 		i++
 		if i%1000 == 0 {
 			fmt.Println("iteration", i, entry.Flavor)
+		}
+		if okList[entry.Flavor] == false {
+			continue
+		}
+		if entry.Flavor == "diamond" {
+			database.InsertDiamondSqlite(sdb, entry.Thing.(*lib.DiamondEntry))
+		} else if entry.Flavor == "follow" {
+			database.InsertFollowee(sdb, base58.Encode(entry.Followed),
+				base58.Encode(entry.Follower))
+		} else if entry.Flavor == "post" {
+			database.InsertPostSqlite(sdb, entry.Thing.(*lib.PostEntry))
+		} else if entry.Flavor == "profile" {
+			database.InsertProfileSqlite(sdb, entry.Thing.(*lib.ProfileEntry))
+		} else if entry.Flavor == "done" {
+			break
 		}
 	}
 	return nil

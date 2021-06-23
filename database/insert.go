@@ -73,3 +73,24 @@ func InsertFollowee(sdb *sql.DB, followee, follower string) {
 		fmt.Println(e)
 	}
 }
+func InsertDiamondSqlite(sdb *sql.DB, de *lib.DiamondEntry) {
+	tx, _ := sdb.Begin()
+
+	s := `insert into diamonds (hash, sender, receiver, level) values (?, ?, ?, ?)`
+	thing, e := tx.Prepare(s)
+	if e != nil {
+		fmt.Println(e)
+	}
+	_, e = thing.Exec(base58.Encode(de.DiamondPostHash.Bytes()),
+		base58.Encode(de.SenderPKID[:]),
+		base58.Encode(de.ReceiverPKID[:]),
+		de.DiamondLevel)
+	if e != nil {
+		fmt.Println(e)
+	}
+
+	e = tx.Commit()
+	if e != nil {
+		fmt.Println(e)
+	}
+}

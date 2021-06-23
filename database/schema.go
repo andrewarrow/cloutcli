@@ -41,6 +41,10 @@ CREATE INDEX uf_followee_idx
 
 CREATE INDEX uf_follower_idx
   ON user_follower (follower);
+
+create table diamonds (hash, sender, receiver text, level integer);
+CREATE INDEX diamonds_hash ON diamonds (hash);
+CREATE INDEX diamonds_receiver ON diamonds (receiver);
 `
 	_, err := sdb.Exec(sqlStmt)
 	if err != nil {
