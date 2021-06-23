@@ -93,6 +93,7 @@ type User struct {
 type HODLerThing struct {
 	HODLerPublicKeyBase58Check  string
 	CreatorPublicKeyBase58Check string
+	HasPurchased                bool
 	BalanceNanos                int64
 	ProfileEntryResponse        ProfileEntryResponse
 }

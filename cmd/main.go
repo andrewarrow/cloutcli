@@ -12,6 +12,7 @@ func PrintHelp() {
 	fmt.Println("")
 	fmt.Println("  clout account               # list your various accounts")
 	fmt.Println("  clout message               # send, send bulk, read")
+	fmt.Println("  clout sell                  # sell coins")
 	fmt.Println("  clout sqlite                # import from badger, query sqlite")
 	fmt.Println("  clout ls                    # list global posts")
 	fmt.Println("")
@@ -34,6 +35,8 @@ func main() {
 		HandleMessage()
 	} else if command == "ls" {
 		HandleLs()
+	} else if command == "sell" {
+		HandleSell()
 	} else if command == "sqlite" {
 		HandleSqlite()
 	}
