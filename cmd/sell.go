@@ -14,7 +14,7 @@ func HandleSell() {
 	if words == "" {
 		return
 	}
-	rate := cloutcli.GetRate()
+	//rate := cloutcli.GetRate()
 	pub58, _ := keys.ComputeKeysFromSeed(words)
 	me := cloutcli.Pub58ToUser(pub58)
 
