@@ -21,6 +21,7 @@ func EnumerateAll(testing bool, db *badger.DB, c *chan EntryHolder) {
 	desiredPrefixes := map[string]bool{"17": true,
 		"23": true,
 		"29": true,
+		"30": true,
 		"39": true,
 		"41": true}
 	db.View(func(txn *badger.Txn) error {
