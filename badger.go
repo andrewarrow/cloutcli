@@ -23,11 +23,6 @@ func ImportFromBadgerToSqlite(dir string) error {
 	}
 	defer db.Close()
 	entryChan := make(chan database.EntryHolder, 1024)
-	go database.EnumerateAll(Testing, db, &entryChan)
-
-	sdb := database.OpenSqliteDB()
-	database.CreateSchema(sdb)
-	defer sdb.Close()
 
 	okList := map[string]bool{"diamond": true,
 		"like":    true,
@@ -41,8 +36,12 @@ func ImportFromBadgerToSqlite(dir string) error {
 			okList[item] = true
 		}
 	}
-	okList["done"] = true
 	fmt.Println(okList)
+	go database.EnumerateAll(okList, Testing, db, &entryChan)
+
+	sdb := database.OpenSqliteDB()
+	database.CreateSchema(sdb)
+	defer sdb.Close()
 
 	i := 0
 	for entry := range entryChan {

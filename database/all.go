@@ -3,7 +3,6 @@ package database
 import (
 	"bytes"
 	"encoding/gob"
-	"fmt"
 
 	"github.com/andrewarrow/cloutcli/lib"
 	"github.com/dgraph-io/badger/v3"
@@ -16,73 +15,74 @@ type EntryHolder struct {
 	Followed []byte
 }
 
-func EnumerateAll(testing bool, db *badger.DB, c *chan EntryHolder) {
+func EnumerateAll(okList map[string]bool, testing bool, db *badger.DB, c *chan EntryHolder) {
+	desiredPrefixes := map[byte]string{17: "post",
+		23: "profile",
+		29: "follow",
+		30: "like",
+		39: "reclout",
+		41: "diamond"}
+	for b, flavor := range desiredPrefixes {
+		if okList[flavor] == false {
+			continue
+		}
+		EnumeratePrefix(flavor, []byte{b}, testing, db, c)
+	}
+	holder := EntryHolder{}
+	holder.Flavor = "done"
+	*c <- holder
+}
 
-	desiredPrefixes := map[string]bool{"17": true,
-		"23": true,
-		"29": true,
-		"30": true,
-		"39": true,
-		"41": true}
+func EnumeratePrefix(flavor string, prefix []byte, testing bool, db *badger.DB, c *chan EntryHolder) {
+
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
 		nodeIterator := txn.NewIterator(opts)
-		prefix := []byte{}
 
-		flavorMap := map[string]int{}
+		i := 0
 		for nodeIterator.Seek(prefix); nodeIterator.ValidForPrefix(prefix); nodeIterator.Next() {
-			key := nodeIterator.Item().Key()
-			keyPrefix := fmt.Sprintf("%d", key[0])
-
-			if desiredPrefixes[keyPrefix] == false {
-				continue
-			}
-
-			val, _ := nodeIterator.Item().ValueCopy(nil)
+			i++
 			holder := EntryHolder{}
-			if keyPrefix == "17" {
+			holder.Flavor = flavor
+			if flavor == "post" {
+				val, _ := nodeIterator.Item().ValueCopy(nil)
 				post := &lib.PostEntry{}
 				gob.NewDecoder(bytes.NewReader(val)).Decode(post)
-				holder.Flavor = "post"
 				holder.Thing = post
-			} else if keyPrefix == "23" {
+			} else if flavor == "profile" {
+				val, _ := nodeIterator.Item().ValueCopy(nil)
 				profile := &lib.ProfileEntry{}
 				gob.NewDecoder(bytes.NewReader(val)).Decode(profile)
-				holder.Flavor = "profile"
 				holder.Thing = profile
-			} else if keyPrefix == "29" {
+			} else if flavor == "follow" {
+				key := nodeIterator.Item().Key()
 				follower := key[1:34]
 				followed := key[34:]
-				holder.Flavor = "follow"
 				holder.Follower = follower
 				holder.Followed = followed
-			} else if keyPrefix == "30" {
+			} else if flavor == "like" {
+				key := nodeIterator.Item().Key()
 				le := &lib.LikeEntry{}
 				le.LikerPubKey = key[1:34]
 				le.LikedPostHash = key[34:]
-				holder.Flavor = "like"
 				holder.Thing = le
-			} else if keyPrefix == "39" {
-				holder.Flavor = "reclout"
+			} else if flavor == "reclout" {
+				val, _ := nodeIterator.Item().ValueCopy(nil)
 				re := &lib.RecloutEntry{}
 				gob.NewDecoder(bytes.NewReader(val)).Decode(re)
 				holder.Thing = re
-			} else if keyPrefix == "41" {
+			} else if flavor == "diamond" {
+				val, _ := nodeIterator.Item().ValueCopy(nil)
 				de := &lib.DiamondEntry{}
 				gob.NewDecoder(bytes.NewReader(val)).Decode(de)
-				holder.Flavor = "diamond"
 				holder.Thing = de
 			}
-			if testing && flavorMap[holder.Flavor] > 1000 {
+			if testing && i > 1000 {
 				continue
 			}
 			*c <- holder
-			flavorMap[holder.Flavor]++
 		}
 		nodeIterator.Close()
-		holder := EntryHolder{}
-		holder.Flavor = "done"
-		*c <- holder
 		return nil
 	})
 
