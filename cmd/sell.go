@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strconv"
 
@@ -10,7 +11,23 @@ import (
 	"github.com/andrewarrow/cloutcli/keys"
 )
 
+func PrintSellHelp() {
+	fmt.Println("")
+	fmt.Println("  clout sell dust           # --limit=x [--execute]")
+	fmt.Println("")
+}
 func HandleSell() {
+	if len(os.Args) < 3 {
+		PrintSellHelp()
+		return
+	}
+	command := os.Args[2]
+	if command == "dust" {
+		HandleSellDust()
+	}
+}
+
+func HandleSellDust() {
 	words := WarnAboutWords()
 	if words == "" {
 		return
