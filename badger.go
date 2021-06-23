@@ -30,11 +30,11 @@ func ImportFromBadgerToSqlite(dir string) error {
 	defer sdb.Close()
 
 	okList := map[string]bool{"diamond": true,
-		"likes":    true,
-		"reclouts": true,
-		"follow":   true,
-		"post":     true,
-		"profile":  true}
+		"like":    true,
+		"reclout": true,
+		"follow":  true,
+		"post":    true,
+		"profile": true}
 	if Tables != "" {
 		okList = map[string]bool{}
 		for _, item := range strings.Split(Tables, ",") {
