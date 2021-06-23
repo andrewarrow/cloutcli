@@ -21,6 +21,7 @@ func EnumerateAll(testing bool, db *badger.DB, c *chan EntryHolder) {
 	desiredPrefixes := map[string]bool{"17": true,
 		"23": true,
 		"29": true,
+		"39": true,
 		"41": true}
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
@@ -54,6 +55,17 @@ func EnumerateAll(testing bool, db *badger.DB, c *chan EntryHolder) {
 				holder.Flavor = "follow"
 				holder.Follower = follower
 				holder.Followed = followed
+			} else if keyPrefix == "30" {
+				le := &lib.LikeEntry{}
+				le.LikerPubKey = key[1:34]
+				le.LikedPostHash = key[34:]
+				holder.Flavor = "like"
+				holder.Thing = le
+			} else if keyPrefix == "39" {
+				holder.Flavor = "reclout"
+				re := &lib.RecloutEntry{}
+				gob.NewDecoder(bytes.NewReader(val)).Decode(re)
+				holder.Thing = re
 			} else if keyPrefix == "41" {
 				de := &lib.DiamondEntry{}
 				gob.NewDecoder(bytes.NewReader(val)).Decode(de)

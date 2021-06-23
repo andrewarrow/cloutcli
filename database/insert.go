@@ -104,7 +104,7 @@ func InsertRecloutSqlite(sdb *sql.DB, re *lib.RecloutEntry) {
 	}
 	_, e = thing.Exec(base58.Encode(re.RecloutedPostHash.Bytes()),
 		base58.Encode(re.RecloutPostHash.Bytes()),
-		base58.Encode(re.ReclouterPubKey[:]))
+		base58.Encode(re.ReclouterPubKey))
 	if e != nil {
 		fmt.Println(e)
 	}
@@ -122,8 +122,8 @@ func InsertLikeSqlite(sdb *sql.DB, le *lib.LikeEntry) {
 	if e != nil {
 		fmt.Println(e)
 	}
-	_, e = thing.Exec(base58.Encode(le.LikedPostHash.Bytes()),
-		base58.Encode(le.LikerPubKey[:]))
+	_, e = thing.Exec(base58.Encode(le.LikedPostHash),
+		base58.Encode(le.LikerPubKey))
 	if e != nil {
 		fmt.Println(e)
 	}

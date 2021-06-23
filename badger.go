@@ -30,9 +30,11 @@ func ImportFromBadgerToSqlite(dir string) error {
 	defer sdb.Close()
 
 	okList := map[string]bool{"diamond": true,
-		"follow":  true,
-		"post":    true,
-		"profile": true}
+		"likes":    true,
+		"reclouts": true,
+		"follow":   true,
+		"post":     true,
+		"profile":  true}
 	if Tables != "" {
 		okList = map[string]bool{}
 		for _, item := range strings.Split(Tables, ",") {
@@ -56,10 +58,14 @@ func ImportFromBadgerToSqlite(dir string) error {
 		} else if entry.Flavor == "follow" {
 			database.InsertFollowee(sdb, base58.Encode(entry.Followed),
 				base58.Encode(entry.Follower))
+		} else if entry.Flavor == "like" {
+			database.InsertLikeSqlite(sdb, entry.Thing.(*lib.LikeEntry))
 		} else if entry.Flavor == "post" {
 			database.InsertPostSqlite(sdb, entry.Thing.(*lib.PostEntry))
 		} else if entry.Flavor == "profile" {
 			database.InsertProfileSqlite(sdb, entry.Thing.(*lib.ProfileEntry))
+		} else if entry.Flavor == "reclout" {
+			database.InsertRecloutSqlite(sdb, entry.Thing.(*lib.RecloutEntry))
 		} else if entry.Flavor == "done" {
 			break
 		}

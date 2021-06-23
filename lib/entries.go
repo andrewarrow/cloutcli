@@ -66,7 +66,7 @@ type DiamondEntry struct {
 
 type LikeEntry struct {
 	LikerPubKey   []byte
-	LikedPostHash *BlockHash
+	LikedPostHash []byte
 	isDeleted     bool
 }
 
