@@ -54,7 +54,7 @@ CREATE INDEX reclouts_reclouter ON reclouts (reclouter);
 
 create table likes (hash, liker text);
 CREATE INDEX like_hash ON likes (hash);
-CREATE INDEX like_sender ON likes (liker);
+CREATE INDEX like_liker ON likes (liker);
 `
 	_, err := sdb.Exec(sqlStmt)
 	if err != nil {
