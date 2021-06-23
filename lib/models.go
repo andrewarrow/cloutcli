@@ -97,3 +97,9 @@ type HODLerThing struct {
 	BalanceNanos                int64
 	ProfileEntryResponse        ProfileEntryResponse
 }
+
+type Rate struct {
+	SatoshisPerBitCloutExchangeRate int64
+	NanosSold                       int64
+	USDCentsPerBitcoinExchangeRate  int64
+}
