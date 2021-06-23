@@ -2,6 +2,7 @@ package cloutcli
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/andrewarrow/cloutcli/database"
 	"github.com/andrewarrow/cloutcli/lib"
@@ -13,6 +14,7 @@ import (
 // https://github.com/bitclout/core/blob/main/lib/db_utils.go
 
 var Testing bool
+var Tables string
 
 func ImportFromBadgerToSqlite(dir string) error {
 	db, err := badger.Open(badger.DefaultOptions(dir))
@@ -27,13 +29,18 @@ func ImportFromBadgerToSqlite(dir string) error {
 	database.CreateSchema(sdb)
 	defer sdb.Close()
 
+	skipList := map[string]bool{}
+	for _, item := range strings.Split(Tables, ",") {
+		skipList[item] = true
+	}
+
 	i := 0
 	for entry := range entryChan {
-		if entry.Flavor == "post" {
+		if entry.Flavor == "post" && !skipList["post"] {
 			database.InsertPostSqlite(sdb, entry.Thing.(*lib.PostEntry))
-		} else if entry.Flavor == "profile" {
+		} else if entry.Flavor == "profile" && !skipList["profile"] {
 			database.InsertProfileSqlite(sdb, entry.Thing.(*lib.ProfileEntry))
-		} else if entry.Flavor == "follow" {
+		} else if entry.Flavor == "follow" && !skipList["follow"] {
 			database.InsertFollowee(sdb, base58.Encode(entry.Followed),
 				base58.Encode(entry.Follower))
 		} else if entry.Flavor == "done" {

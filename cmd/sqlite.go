@@ -26,6 +26,7 @@ func HandleSqlite() {
 		if argMap["testing"] != "" {
 			cloutcli.Testing = true
 		}
+		cloutcli.Tables = argMap["tables"]
 		cloutcli.ImportFromBadgerToSqlite(dir)
 	} else if command == "query" {
 		term := argMap["term"]
