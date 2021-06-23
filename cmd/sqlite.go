@@ -12,6 +12,7 @@ import (
 func PrintSqliteHelp() {
 	fmt.Println("")
 	fmt.Println("  clout sqlite fill           # --dir=/path/to/badgerdb")
+	fmt.Println("  clout sqlite graph          # produce clout.gv file")
 	fmt.Println("  clout sqlite query          # --term=foo")
 	fmt.Println("")
 }
@@ -28,6 +29,8 @@ func HandleSqlite() {
 		}
 		cloutcli.Tables = argMap["tables"]
 		cloutcli.ImportFromBadgerToSqlite(dir)
+	} else if command == "graph" {
+		ProduceCloutGV()
 	} else if command == "query" {
 		term := argMap["term"]
 		table := argMap["table"]
@@ -58,4 +61,7 @@ func DirCheck() string {
 		return home + dir[1:]
 	}
 	return dir
+}
+
+func ProduceCloutGV() {
 }
