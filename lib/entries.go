@@ -63,3 +63,16 @@ type DiamondEntry struct {
 	DiamondLevel    int64
 	isDeleted       bool
 }
+
+type LikeEntry struct {
+	LikerPubKey   []byte
+	LikedPostHash *BlockHash
+	isDeleted     bool
+}
+
+type RecloutEntry struct {
+	ReclouterPubKey   []byte
+	RecloutPostHash   *BlockHash
+	RecloutedPostHash *BlockHash
+	isDeleted         bool
+}

@@ -94,3 +94,42 @@ func InsertDiamondSqlite(sdb *sql.DB, de *lib.DiamondEntry) {
 		fmt.Println(e)
 	}
 }
+func InsertRecloutSqlite(sdb *sql.DB, re *lib.RecloutEntry) {
+	tx, _ := sdb.Begin()
+
+	s := `insert into reclouts (hash, other_hash, reclouter) values (?, ?, ?)`
+	thing, e := tx.Prepare(s)
+	if e != nil {
+		fmt.Println(e)
+	}
+	_, e = thing.Exec(base58.Encode(re.RecloutedPostHash.Bytes()),
+		base58.Encode(re.RecloutPostHash.Bytes()),
+		base58.Encode(re.ReclouterPubKey[:]))
+	if e != nil {
+		fmt.Println(e)
+	}
+
+	e = tx.Commit()
+	if e != nil {
+		fmt.Println(e)
+	}
+}
+func InsertLikeSqlite(sdb *sql.DB, le *lib.LikeEntry) {
+	tx, _ := sdb.Begin()
+
+	s := `insert into likes (hash, liker) values (?, ?)`
+	thing, e := tx.Prepare(s)
+	if e != nil {
+		fmt.Println(e)
+	}
+	_, e = thing.Exec(base58.Encode(le.LikedPostHash.Bytes()),
+		base58.Encode(le.LikerPubKey[:]))
+	if e != nil {
+		fmt.Println(e)
+	}
+
+	e = tx.Commit()
+	if e != nil {
+		fmt.Println(e)
+	}
+}

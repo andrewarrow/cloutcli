@@ -45,6 +45,16 @@ CREATE INDEX uf_follower_idx
 create table diamonds (hash, sender, receiver text, level integer);
 CREATE INDEX diamonds_hash ON diamonds (hash);
 CREATE INDEX diamonds_receiver ON diamonds (receiver);
+CREATE INDEX diamonds_sender ON diamonds (sender);
+
+create table reclouts (hash, other_hash, reclouter text);
+CREATE INDEX reclouts_hash ON reclouts (hash);
+CREATE INDEX reclouts_other_hash ON reclouts (other_hash);
+CREATE INDEX reclouts_reclouter ON reclouts (reclouter);
+
+create table likes (hash, sender text);
+CREATE INDEX like_hash ON likes (hash);
+CREATE INDEX like_sender ON likes (sender);
 `
 	_, err := sdb.Exec(sqlStmt)
 	if err != nil {
