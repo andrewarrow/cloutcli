@@ -15,7 +15,7 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 
 	postMap := map[string]bool{}
 	prefix := []byte{17}
-	goal := base58.Encode(UsernameToPub(db, author))
+	goal := UsernameToPub(db, author)
 	//prefix = append(prefix, UsernameToPub(db, author)...)
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
@@ -32,8 +32,7 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 			post := &lib.PostEntry{}
 			gob.NewDecoder(bytes.NewReader(val)).Decode(post)
 
-			ppk := base58.Encode(post.PosterPublicKey)
-			if ppk == goal {
+			if bytes.Compare(post.PosterPublicKey, goal) == 0 {
 				postMap[base58.Encode(post.PostHash.Bytes())] = true
 			}
 
