@@ -133,23 +133,3 @@ func InsertLikeSqlite(sdb *sql.DB, le *lib.LikeEntry) {
 		fmt.Println(e)
 	}
 }
-func InsertUserNodeSqlite(sdb *sql.DB, username string, id int64) {
-	tx, _ := sdb.Begin()
-
-	s := `insert into user_nodes (username, node_id) values (?, ?)`
-	thing, e := tx.Prepare(s)
-	if e != nil {
-		fmt.Println(e)
-		return
-	}
-	_, e = thing.Exec(username, id)
-	if e != nil {
-		fmt.Println(e)
-		return
-	}
-
-	e = tx.Commit()
-	if e != nil {
-		fmt.Println(e)
-	}
-}

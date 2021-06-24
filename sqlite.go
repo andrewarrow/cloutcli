@@ -70,7 +70,7 @@ func QuerySqliteFollow(tab, s, degrees string) {
 func QuerySqliteNodesInOrder(f *os.File) {
 	db := database.OpenSqliteDB()
 	defer db.Close()
-	rows, err := db.Query("select username from users order by username")
+	rows, err := db.Query("select username from users order by user_id")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -83,7 +83,6 @@ func QuerySqliteNodesInOrder(f *os.File) {
 		rows.Scan(&username)
 		line := fmt.Sprintf(" n%d [label=\"%s\"];\n", i, username)
 		f.Write([]byte(line))
-		database.InsertUserNodeSqlite(db, username, i)
 		i++
 	}
 }
@@ -102,7 +101,7 @@ func QuerySqliteNodeConnections(f *os.File) {
 		var followee string
 		var follower string
 		rows.Scan(&followee, &follower)
-		line := fmt.Sprintf(" n%d -> n%d;")
+		line := fmt.Sprintf(" n%d -> n%d;", 0, 0)
 		f.Write([]byte(line))
 		i++
 	}
