@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/andrewarrow/cloutcli"
+	"github.com/andrewarrow/cloutcli/database"
 )
 
 func PrintSqliteHelp() {
@@ -64,4 +65,16 @@ func DirCheck() string {
 }
 
 func ProduceCloutGV() {
+	fmt.Println("creating clout.gv...")
+	f, _ := os.Create("clout.gv")
+	f.Write([]byte("digraph regexp {\n"))
+	fmt.Println("writing nodes...")
+	db := database.OpenSqliteDB()
+	database.DeleteUserNodeSqlite(db)
+	db.Close()
+	cloutcli.QuerySqliteNodesInOrder(f)
+	fmt.Println("writing connections...")
+	cloutcli.QuerySqliteNodeConnections(f)
+	f.Write([]byte("}\n"))
+	f.Close()
 }

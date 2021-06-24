@@ -18,6 +18,10 @@ func OpenSqliteDB() *sql.DB {
 
 func CreateSchema(sdb *sql.DB) {
 	sqlStmt := `
+create table user_nodes (username text, node_id integer);
+CREATE INDEX user_nodes_username_idx
+  ON user_nodes (username);
+
 create table posts (author text, hash text, body text, created_at datetime);
 
 CREATE UNIQUE INDEX posts_hash_idx

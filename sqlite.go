@@ -2,6 +2,7 @@ package cloutcli
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/andrewarrow/cloutcli/database"
@@ -64,6 +65,46 @@ func QuerySqliteFollow(tab, s, degrees string) {
 		if tabSize+1 < limit {
 			QuerySqliteFollow(tab+"  ", username, degrees)
 		}
+	}
+}
+func QuerySqliteNodesInOrder(f *os.File) {
+	db := database.OpenSqliteDB()
+	defer db.Close()
+	rows, err := db.Query("select username from users order by username")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer rows.Close()
+
+	i := int64(0)
+	for rows.Next() {
+		var username string
+		rows.Scan(&username)
+		line := fmt.Sprintf(" n%d [label=\"%s\"];\n", i, username)
+		f.Write([]byte(line))
+		database.InsertUserNodeSqlite(db, username, i)
+		i++
+	}
+}
+func QuerySqliteNodeConnections(f *os.File) {
+	db := database.OpenSqliteDB()
+	defer db.Close()
+	rows, err := db.Query("select followee, follower from user_follower")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer rows.Close()
+
+	i := 0
+	for rows.Next() {
+		var followee string
+		var follower string
+		rows.Scan(&followee, &follower)
+		line := fmt.Sprintf(" n%d -> n%d;")
+		f.Write([]byte(line))
+		i++
 	}
 }
 func SearchSqliteUsername(s string) string {
