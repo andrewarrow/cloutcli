@@ -71,6 +71,26 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 		return nil
 	})
 
+	diamondMap := map[string]bool{}
+	prefix = []byte{41}
+	db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			val, _ := it.Item().ValueCopy(nil)
+			de := &lib.DiamondEntry{}
+			gob.NewDecoder(bytes.NewReader(val)).Decode(de)
+
+			if postMap[base58.Encode(de.DiamondPostHash.Bytes())] {
+				recloutMap[base58.Encode(de.SenderPKID[:])] = true
+				InsertDiamondSqlite(sdb, de)
+			}
+		}
+		return nil
+	})
+
 	prefix = []byte{23}
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
@@ -80,7 +100,7 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
 			key := it.Item().Key()
 			pub58 := base58.Encode(key[1:])
-			if likeMap[pub58] || recloutMap[pub58] {
+			if likeMap[pub58] || recloutMap[pub58] || diamondMap[pub58] {
 				val, _ := it.Item().ValueCopy(nil)
 				profile := &lib.ProfileEntry{}
 				gob.NewDecoder(bytes.NewReader(val)).Decode(profile)
