@@ -114,6 +114,24 @@ where u1.pub58 = uf.followee and
 		i++
 	}
 }
+func QuerySqliteLikesForAuthor(authorUsername string) {
+	db := database.OpenSqliteDB()
+	defer db.Close()
+	sql := `select count(1) as c, u.username from likes l, users u where u.pub58 = l.liker and l.hash in (select hash from posts where author='vEti4am3DnQAxrk1GdNdqQyvAo5pspWVJCHPFD3bCvNF') group by u.username order by c desc`
+	rows, err := db.Query(sql)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var count int64
+		var username string
+		rows.Scan(&count, &username)
+		fmt.Printf("% 10d %20s\n", count, username)
+	}
+}
 func SearchSqliteUsername(s string) string {
 	db := database.OpenSqliteDB()
 	defer db.Close()
