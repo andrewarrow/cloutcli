@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/andrewarrow/cloutcli"
+	"github.com/andrewarrow/cloutcli/database"
+	"github.com/dgraph-io/badger/v3"
 )
 
 func PrintSqliteHelp() {
@@ -25,6 +27,16 @@ func HandleSqlite() {
 	command := os.Args[2]
 	if command == "fill" {
 		dir := DirCheck()
+
+		if argMap["stats"] != "" {
+
+			db, _ := badger.Open(badger.DefaultOptions(dir))
+			defer db.Close()
+			items := database.PostsByAuthor(db, "andrewarrow")
+			fmt.Println(len(items))
+			return
+		}
+
 		if argMap["testing"] != "" {
 			cloutcli.Testing = true
 		}

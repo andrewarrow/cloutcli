@@ -37,7 +37,9 @@ func UsernameToPub(db *badger.DB, username string) []byte {
 		prefix := []byte{25}
 		key := append(prefix, []byte(username)...)
 		profileEntryItem, _ := txn.Get(key)
-		pub, _ = profileEntryItem.ValueCopy(nil)
+		if profileEntryItem != nil {
+			pub, _ = profileEntryItem.ValueCopy(nil)
+		}
 
 		return nil
 	})
