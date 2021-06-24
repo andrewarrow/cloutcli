@@ -12,18 +12,20 @@ import (
 func PostsByAuthor(db *badger.DB, author string) []string {
 
 	posts := []string{}
-	author58 := base58.Encode(UsernameToPub(db, author))
+	prefix := []byte{35}
+	prefix = append(prefix, UsernameToPub(db, author)...)
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
-		nodeIterator := txn.NewIterator(opts)
-		defer nodeIterator.Close()
-		prefix := []byte{18}
+		it := txn.NewIterator(opts)
+		defer it.Close()
 
-		for nodeIterator.Seek(prefix); nodeIterator.ValidForPrefix(prefix); nodeIterator.Next() {
-			key := nodeIterator.Item().Key()
-			if base58.Encode(key[1:34]) == author58 {
-				posts = append(posts, base58.Encode(key[34:]))
-			}
+		timestampSizeBytes := 8
+		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			rawKey := it.Item().Key()
+			keyWithoutPrefix := rawKey[1:]
+			publicKeySizeBytes := lib.HashSizeBytes + 1
+			hash := keyWithoutPrefix[(publicKeySizeBytes + timestampSizeBytes):]
+			posts = append(posts, base58.Encode(hash))
 		}
 		return nil
 	})
