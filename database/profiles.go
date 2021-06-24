@@ -27,6 +27,24 @@ func EnumerateProfiles(db *badger.DB, c *chan *lib.ProfileEntry) {
 	})
 
 }
+func UsernameToPub(db *badger.DB, username string) []byte {
+	pub := []byte{}
+
+	db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		nodeIterator := txn.NewIterator(opts)
+		defer nodeIterator.Close()
+		prefix := []byte{25}
+		key := append(prefix, []byte(username)...)
+		profileEntryItem, _ := txn.Get(key)
+		pub, _ = profileEntryItem.ValueCopy(nil)
+
+		return nil
+	})
+
+	return pub
+
+}
 func LookupUsername(db *badger.DB, pkid []byte) string {
 
 	username := ""
