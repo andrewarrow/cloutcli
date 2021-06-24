@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/andrewarrow/cloutcli/lib"
@@ -65,7 +66,9 @@ func InsertFollowee(sdb *sql.DB, followee, follower string) {
 	}
 	_, e = thing.Exec(followee, follower)
 	if e != nil {
-		fmt.Println(e)
+		if !strings.Contains(e.Error(), "UNIQUE constraint failed") {
+			fmt.Println(e)
+		}
 	}
 
 	e = tx.Commit()

@@ -36,6 +36,9 @@ CREATE INDEX users_username_idx
 
 create table user_follower (followee text, follower text);
 
+CREATE UNIQUE INDEX uf_followee_follower_idx
+  ON user_follower (followee, follower);
+
 CREATE INDEX uf_followee_idx
   ON user_follower (followee);
 
