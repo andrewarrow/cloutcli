@@ -97,7 +97,7 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 			gob.NewDecoder(bytes.NewReader(val)).Decode(de)
 
 			if postMap[base58.Encode(de.DiamondPostHash.Bytes())] {
-				recloutMap[base58.Encode(de.SenderPKID[:])] = true
+				diamondMap[base58.Encode(de.SenderPKID[:])] = true
 				InsertDiamondSqlite(sdb, de)
 			}
 		}
