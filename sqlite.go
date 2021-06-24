@@ -117,8 +117,18 @@ where u1.pub58 = uf.followee and
 func QuerySqliteLikesForAuthor(authorUsername string) {
 	db := database.OpenSqliteDB()
 	defer db.Close()
-	sql := `select count(1) as c, u.username from likes l, users u where u.pub58 = l.liker and l.hash in (select hash from posts where author='vEti4am3DnQAxrk1GdNdqQyvAo5pspWVJCHPFD3bCvNF') group by u.username order by c desc`
-	rows, err := db.Query(sql)
+	sql := `SELECT count(1) as c, u.username 
+            FROM likes l, users u 
+					 WHERE u.pub58 = l.liker AND 
+					       l.hash in (
+							SELECT p.hash 
+							  FROM posts p, users u
+						  	WHERE p.author=u.pub58 AND
+								      u.username = '%s'
+			     	) 
+					GROUP BY u.username 
+					ORDER BY c desc`
+	rows, err := db.Query(fmt.Sprintf(sql, authorUsername))
 	if err != nil {
 		fmt.Println(err)
 		return
