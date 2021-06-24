@@ -51,6 +51,26 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 		return nil
 	})
 
+	recloutMap := map[string]bool{}
+	prefix = []byte{39}
+	db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			val, _ := it.Item().ValueCopy(nil)
+			re := &lib.RecloutEntry{}
+			gob.NewDecoder(bytes.NewReader(val)).Decode(re)
+
+			if postMap[base58.Encode(re.RecloutedPostHash.Bytes())] {
+				recloutMap[base58.Encode(re.ReclouterPubKey)] = true
+				InsertRecloutSqlite(sdb, re)
+			}
+		}
+		return nil
+	})
+
 	prefix = []byte{23}
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
@@ -59,7 +79,8 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 
 		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
 			key := it.Item().Key()
-			if likeMap[base58.Encode(key[1:])] {
+			pub58 := base58.Encode(key[1:])
+			if likeMap[pub58] || recloutMap[pub58] {
 				val, _ := it.Item().ValueCopy(nil)
 				profile := &lib.ProfileEntry{}
 				gob.NewDecoder(bytes.NewReader(val)).Decode(profile)
