@@ -72,5 +72,6 @@ func ProduceCloutGV() {
 	fmt.Println("writing connections...")
 	cloutcli.QuerySqliteNodeConnections(f)
 	f.Write([]byte("}\n"))
+	fmt.Println("done")
 	f.Close()
 }
