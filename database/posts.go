@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/gob"
+	"fmt"
 
 	"github.com/andrewarrow/cloutcli/lib"
 	"github.com/btcsuite/btcutil/base58"
@@ -30,6 +31,7 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 		}
 		return nil
 	})
+	fmt.Println("postMap", len(postMap))
 
 	likeMap := map[string]bool{}
 	prefix = []byte{30}
@@ -50,6 +52,7 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 		}
 		return nil
 	})
+	fmt.Println("likeMap", len(likeMap))
 
 	recloutMap := map[string]bool{}
 	prefix = []byte{39}
@@ -70,6 +73,7 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 		}
 		return nil
 	})
+	fmt.Println("recloutMap", len(recloutMap))
 
 	diamondMap := map[string]bool{}
 	prefix = []byte{41}
@@ -90,6 +94,7 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 		}
 		return nil
 	})
+	fmt.Println("diamondMap", len(diamondMap))
 
 	prefix = []byte{23}
 	db.View(func(txn *badger.Txn) error {
@@ -97,6 +102,7 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 		it := txn.NewIterator(opts)
 		defer it.Close()
 
+		i := 0
 		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
 			key := it.Item().Key()
 			pub58 := base58.Encode(key[1:])
@@ -105,8 +111,10 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 				profile := &lib.ProfileEntry{}
 				gob.NewDecoder(bytes.NewReader(val)).Decode(profile)
 				InsertProfileSqlite(sdb, profile)
+				i++
 			}
 		}
+		fmt.Println("i", i)
 		return nil
 	})
 }
