@@ -30,7 +30,10 @@ func HandleSqlite() {
 
 		if argMap["stats"] != "" {
 
-			db, _ := badger.Open(badger.DefaultOptions(dir))
+			opts := badger.DefaultOptions(dir)
+			opts.ValueDir = dir
+			opts.MemTableSize = 1024 << 20
+			db, _ := badger.Open(opts)
 			defer db.Close()
 			sdb := database.OpenSqliteDB()
 			database.CreateSchema(sdb)

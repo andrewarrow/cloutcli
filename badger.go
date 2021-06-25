@@ -17,7 +17,10 @@ var Testing bool
 var Tables string
 
 func ImportFromBadgerToSqlite(dir string) error {
-	db, err := badger.Open(badger.DefaultOptions(dir))
+	opts := badger.DefaultOptions(dir)
+	opts.ValueDir = dir
+	opts.MemTableSize = 1024 << 20
+	db, err := badger.Open(opts)
 	if err != nil {
 		return err
 	}
