@@ -43,6 +43,11 @@ func MongoConnect() *mongo.Client {
 	return client
 
 }
+
+type Thing struct {
+	MongoMeta string
+}
+
 func MongoList() {
 	client := MongoConnect()
 	collection := client.Database("bitclout").Collection("data")
@@ -51,8 +56,16 @@ func MongoList() {
 	cur, _ := collection.Find(ctx, bson.D{})
 	defer cur.Close(ctx)
 	for cur.Next(ctx) {
-		var result bson.D
+		var result Thing
 		cur.Decode(&result)
-		fmt.Println(result)
+		fmt.Printf("%+v\n", result)
 	}
+
+	/*
+		var result struct {
+			Value float64
+		}
+		filter := bson.D{{"name", "pi"}}
+		collection.FindOne(ctx, filter).Decode(&result)
+	*/
 }
