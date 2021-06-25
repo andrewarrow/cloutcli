@@ -29,18 +29,21 @@ func EnumerateProfiles(db *badger.DB, c *chan *lib.ProfileEntry) {
 }
 func UsernameToPub(db *badger.DB, username string) []byte {
 	pub := []byte{}
+	prefix := []byte{25}
+	prefix = append(prefix, []byte(author)...)
 
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
-		nodeIterator := txn.NewIterator(opts)
-		defer nodeIterator.Close()
-		prefix := []byte{25}
-		key := append(prefix, []byte(username)...)
-		profileEntryItem, _ := txn.Get(key)
-		if profileEntryItem != nil {
-			pub, _ = profileEntryItem.ValueCopy(nil)
-		}
+		it := txn.NewIterator(opts)
+		defer it.Close()
 
+		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			key := it.Item().Key()
+			if len(key) == len(prefix) {
+				pub, _ = it.Item().ValueCopy(nil)
+				return nil
+			}
+		}
 		return nil
 	})
 
