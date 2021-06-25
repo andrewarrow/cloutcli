@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -26,7 +28,7 @@ func HandleMongo() {
 	}
 }
 
-func MongoList() {
+func MongoConnect() *mongo.Client {
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
@@ -38,5 +40,19 @@ func MongoList() {
 		log.Fatalf("Failed to ping MongoDB:  %v", err)
 	}
 
-	fmt.Println("Successfully Connected to MongoDB.")
+	return client
+
+}
+func MongoList() {
+	client := MongoConnect()
+	collection := client.Database("bitclout").Collection("data")
+
+	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
+	cur, _ := collection.Find(ctx, bson.D{})
+	defer cur.Close(ctx)
+	for cur.Next(ctx) {
+		var result bson.D
+		cur.Decode(&result)
+		fmt.Println(result)
+	}
 }
