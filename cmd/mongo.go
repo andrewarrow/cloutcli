@@ -29,7 +29,8 @@ func HandleMongo() {
 }
 
 func MongoConnect() *mongo.Client {
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	//clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	clientOptions := options.Client().ApplyURI("mongodb://192.168.1.50:27017")
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		log.Fatalf("Failed establishing a connection with MongoDB: %v", err)
@@ -45,15 +46,18 @@ func MongoConnect() *mongo.Client {
 }
 
 type Thing struct {
-	MongoMeta string
+	//MongoMeta string
+	PublicKey     string
+	LikedPostHash interface{}
 }
 
 func MongoList() {
 	client := MongoConnect()
 	collection := client.Database("bitclout").Collection("data")
 
-	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
-	cur, _ := collection.Find(ctx, bson.D{})
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	cur, _ := collection.Find(ctx, bson.D{{"BadgerKeyPrefix", "_PrefixLikedPostHashToLikerPubKey:31"}})
+
 	defer cur.Close(ctx)
 	for cur.Next(ctx) {
 		var result Thing
