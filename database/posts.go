@@ -13,8 +13,8 @@ import (
 func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 
 	postMap := map[string]bool{}
-	//prefix := []byte{17}
-	//goal := UsernameToPub(db, author)
+	prefix := []byte{17}
+	goal := UsernameToPub(db, author)
 	//prefix = append(prefix, UsernameToPub(db, author)...)
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
@@ -22,7 +22,7 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 		defer it.Close()
 
 		i := 0
-		for it.Seek(nil); it.Valid(); it.Next() {
+		for itr.Seek(nil); itr.Valid(); itr.Next() {
 			if i%1000 == 0 {
 				fmt.Println("iteration", i)
 			}
