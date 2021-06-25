@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/andrewarrow/cloutcli/lib"
+	"github.com/btcsuite/btcutil/base58"
 	"github.com/dgraph-io/badger/v3"
 )
 
@@ -14,7 +15,7 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 
 	postMap := map[string]bool{}
 	//prefix := []byte{17}
-	//goal := UsernameToPub(db, author)
+	goal := UsernameToPub(db, author)
 	//prefix = append(prefix, UsernameToPub(db, author)...)
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
@@ -23,6 +24,20 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 
 		i := 0
 		for it.Seek(nil); it.Valid(); it.Next() {
+			key := it.Item().Key()
+			prefix := key[0]
+
+			switch prefix {
+			case 17:
+				val, _ := it.Item().ValueCopy(nil)
+
+				post := &lib.PostEntry{}
+				gob.NewDecoder(bytes.NewReader(val)).Decode(post)
+
+				if bytes.Compare(post.PosterPublicKey, goal) == 0 {
+					postMap[base58.Encode(post.PostHash.Bytes())] = true
+				}
+			}
 			if i%1000 == 0 {
 				fmt.Println("iteration", i)
 			}
@@ -33,14 +48,6 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 			for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
 				if i%1000 == 0 {
 					fmt.Println("iteration", i)
-				}
-				val, _ := it.Item().ValueCopy(nil)
-
-				post := &lib.PostEntry{}
-				gob.NewDecoder(bytes.NewReader(val)).Decode(post)
-
-				if bytes.Compare(post.PosterPublicKey, goal) == 0 {
-					postMap[base58.Encode(post.PostHash.Bytes())] = true
 				}
 
 				i++
