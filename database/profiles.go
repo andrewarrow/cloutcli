@@ -30,7 +30,7 @@ func EnumerateProfiles(db *badger.DB, c *chan *lib.ProfileEntry) {
 func UsernameToPub(db *badger.DB, username string) []byte {
 	pub := []byte{}
 	prefix := []byte{25}
-	prefix = append(prefix, []byte(author)...)
+	prefix = append(prefix, []byte(username)...)
 
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
