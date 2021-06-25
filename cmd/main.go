@@ -11,10 +11,11 @@ import (
 func PrintHelp() {
 	fmt.Println("")
 	fmt.Println("  clout account               # list your various accounts")
+	fmt.Println("  clout ls                    # list global posts")
 	fmt.Println("  clout message               # send, send bulk, read")
+	fmt.Println("  clout mongo                 # query from mongodb")
 	fmt.Println("  clout sell                  # sell coins")
 	fmt.Println("  clout sqlite                # import from badger, query sqlite")
-	fmt.Println("  clout ls                    # list global posts")
 	fmt.Println("")
 }
 
@@ -31,10 +32,12 @@ func main() {
 	argMap = args.ToMap()
 
 	if command == "account" || command == "accounts" {
-	} else if command == "message" || command == "messages" {
-		HandleMessage()
 	} else if command == "ls" {
 		HandleLs()
+	} else if command == "message" || command == "messages" {
+		HandleMessage()
+	} else if command == "mongo" || command == "mongodb" {
+		HandleMongo()
 	} else if command == "sell" {
 		HandleSell()
 	} else if command == "sqlite" {
