@@ -11,7 +11,6 @@ import (
 type TopUser struct {
 	Count    string
 	Username string
-	Pic      string
 }
 
 func QuerySqliteTopLikers(fullpath, limit string) []TopUser {
@@ -19,7 +18,7 @@ func QuerySqliteTopLikers(fullpath, limit string) []TopUser {
 	sdb := database.OpenSqliteDB(fullpath)
 	defer sdb.Close()
 
-	rows, err := sdb.Query("select count(1) as c, u.username, u.pic from likes l, users u where l.liker = u.pub58 group by u.username order by c desc limit " + limit)
+	rows, err := sdb.Query("select count(1) as c, u.username from likes l, users u where l.liker = u.pub58 group by u.username order by c desc limit " + limit)
 	if err != nil {
 		fmt.Println(err)
 		return items
@@ -29,9 +28,8 @@ func QuerySqliteTopLikers(fullpath, limit string) []TopUser {
 	for rows.Next() {
 		var c string
 		var liker string
-		var pic string
-		rows.Scan(&c, &liker, &pic)
-		items = append(items, TopUser{c, liker, pic})
+		rows.Scan(&c, &liker)
+		items = append(items, TopUser{c, liker})
 	}
 	return items
 }
@@ -40,7 +38,7 @@ func QuerySqliteTopReclouters(fullpath, limit string) []TopUser {
 	sdb := database.OpenSqliteDB(fullpath)
 	defer sdb.Close()
 
-	rows, err := sdb.Query("select count(1) as c, u.username, u.pic from reclouts r, users u where r.reclouter = u.pub58 group by u.username order by c desc limit " + limit)
+	rows, err := sdb.Query("select count(1) as c, u.username from reclouts r, users u where r.reclouter = u.pub58 group by u.username order by c desc limit " + limit)
 	if err != nil {
 		fmt.Println(err)
 		return items
@@ -50,9 +48,8 @@ func QuerySqliteTopReclouters(fullpath, limit string) []TopUser {
 	for rows.Next() {
 		var c string
 		var reclouter string
-		var pic string
-		rows.Scan(&c, &reclouter, &pic)
-		items = append(items, TopUser{c, reclouter, pic})
+		rows.Scan(&c, &reclouter)
+		items = append(items, TopUser{c, reclouter})
 	}
 	return items
 }
@@ -61,7 +58,7 @@ func QuerySqliteTopDiamondGivers(fullpath, limit string) []TopUser {
 	sdb := database.OpenSqliteDB(fullpath)
 	defer sdb.Close()
 
-	rows, err := sdb.Query("select count(1) as c, u.username, u.pic from diamonds d, users u where d.sender = u.pub58 group by u.username order by c desc limit " + limit)
+	rows, err := sdb.Query("select count(1) as c, u.username from diamonds d, users u where d.sender = u.pub58 group by u.username order by c desc limit " + limit)
 	if err != nil {
 		fmt.Println(err)
 		return items
@@ -71,9 +68,8 @@ func QuerySqliteTopDiamondGivers(fullpath, limit string) []TopUser {
 	for rows.Next() {
 		var c string
 		var giver string
-		var pic string
-		rows.Scan(&c, &giver, &pic)
-		items = append(items, TopUser{c, giver, pic})
+		rows.Scan(&c, &giver)
+		items = append(items, TopUser{c, giver})
 	}
 	return items
 }
