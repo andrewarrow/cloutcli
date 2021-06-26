@@ -15,7 +15,7 @@ func PostsByAuthor(db *badger.DB, author string) {
 
 	prefix := []byte{17}
 
-	bigMap := map[string]bool{}
+	bigMap := map[string]string{}
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
 		it := txn.NewIterator(opts)
@@ -31,7 +31,10 @@ func PostsByAuthor(db *badger.DB, author string) {
 			post := &lib.PostEntry{}
 			gob.NewDecoder(bytes.NewReader(val)).Decode(post)
 
-			bigMap[base58.Encode(post.PosterPublicKey)] = true
+			bigMapKey := base58.Encode(post.PosterPublicKey)
+			if bigMap[bigMapKey] == "" {
+				bigMap[bigMapKey] = LookupUsername(db, post.PosterPublicKey)
+			}
 
 			i++
 		}
@@ -40,9 +43,9 @@ func PostsByAuthor(db *badger.DB, author string) {
 
 	fmt.Println("bigMap size", len(bigMap))
 
-	for k, _ := range bigMap {
-		fmt.Println("bigMap On", k)
-		sdb := OpenSqliteDB("user_sqlites/" + k)
+	for k, v := range bigMap {
+		fmt.Println("bigMap On", v)
+		sdb := OpenSqliteDB("user_sqlites/" + v)
 		CreateSchema(sdb)
 		HandleGatherLikesRecloutsDiamonds(sdb, db, k)
 	}
