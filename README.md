@@ -34,10 +34,9 @@ cloutcli/cmd $ ./clout sqlite
 # building the "clout" executable
 There is no main.go file in the root directory.
 
-Instead cd to the "cmd" directory and run:
-
 ```
-go mod download
+cd cmd
+go mod tidy
 go build
 ./clout
 ```
