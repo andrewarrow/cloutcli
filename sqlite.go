@@ -14,9 +14,9 @@ type TopUser struct {
 	Pic      string
 }
 
-func QuerySqliteTopLikers(username, limit string) []TopUser {
+func QuerySqliteTopLikers(fullpath, limit string) []TopUser {
 	items := []TopUser{}
-	sdb := database.OpenSqliteDB("user_sqlites/" + username)
+	sdb := database.OpenSqliteDB(fullpath)
 	defer sdb.Close()
 
 	rows, err := sdb.Query("select count(1) as c, u.username, u.pic from likes l, users u where l.liker = u.pub58 group by u.username order by c desc limit " + limit)
@@ -35,9 +35,9 @@ func QuerySqliteTopLikers(username, limit string) []TopUser {
 	}
 	return items
 }
-func QuerySqliteTopReclouters(username, limit string) []TopUser {
+func QuerySqliteTopReclouters(fullpath, limit string) []TopUser {
 	items := []TopUser{}
-	sdb := database.OpenSqliteDB("user_sqlites/" + username)
+	sdb := database.OpenSqliteDB(fullpath)
 	defer sdb.Close()
 
 	rows, err := sdb.Query("select count(1) as c, u.username, u.pic from reclouts r, users u where r.reclouter = u.pub58 group by u.username order by c desc limit " + limit)
@@ -56,9 +56,9 @@ func QuerySqliteTopReclouters(username, limit string) []TopUser {
 	}
 	return items
 }
-func QuerySqliteTopDiamondGivers(username, limit string) []TopUser {
+func QuerySqliteTopDiamondGivers(fullpath, limit string) []TopUser {
 	items := []TopUser{}
-	sdb := database.OpenSqliteDB("user_sqlites/" + username)
+	sdb := database.OpenSqliteDB(fullpath)
 	defer sdb.Close()
 
 	rows, err := sdb.Query("select count(1) as c, u.username, u.pic from diamonds d, users u where d.sender = u.pub58 group by u.username order by c desc limit " + limit)

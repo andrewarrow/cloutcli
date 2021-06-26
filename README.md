@@ -27,8 +27,7 @@ cloutcli/cmd $ ./clout sqlite
 
   clout sqlite fill           # --dir=/path/to/badgerdb
   clout sqlite graph          # produce clout.gv file
-  clout sqlite query          # --term=foo
-  clout sqlite likes          # --username=foo
+  clout sqlite query          # --term=foo [--table=x]
 ```
 
 # building the "clout" executable
