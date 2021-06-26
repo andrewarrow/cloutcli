@@ -16,6 +16,7 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 	postMap := map[string]bool{}
 	prefix := []byte{17}
 	goal := UsernameToPub(db, author)
+	fmt.Println(goal)
 	//prefix = append(prefix, UsernameToPub(db, author)...)
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
