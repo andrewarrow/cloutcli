@@ -8,6 +8,75 @@ import (
 	"github.com/andrewarrow/cloutcli/database"
 )
 
+type TopUser struct {
+	Count    string
+	Username string
+	Pic      string
+}
+
+func QuerySqliteTopLikers(username, limit string) []TopUser {
+	items := []TopUser{}
+	sdb := database.OpenSqliteDB("user_sqlites/" + username)
+	defer sdb.Close()
+
+	rows, err := sdb.Query("select count(1) as c, u.username, u.pic from likes l, users u where l.liker = u.pub58 group by u.username order by c desc limit " + limit)
+	if err != nil {
+		fmt.Println(err)
+		return items
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var c string
+		var liker string
+		var pic string
+		rows.Scan(&c, &liker, &pic)
+		items = append(items, TopUser{c, liker, pic})
+	}
+	return items
+}
+func QuerySqliteTopReclouters(username, limit string) []TopUser {
+	items := []TopUser{}
+	sdb := database.OpenSqliteDB("user_sqlites/" + username)
+	defer sdb.Close()
+
+	rows, err := sdb.Query("select count(1) as c, u.username, u.pic from reclouts r, users u where r.reclouter = u.pub58 group by u.username order by c desc limit " + limit)
+	if err != nil {
+		fmt.Println(err)
+		return items
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var c string
+		var reclouter string
+		var pic string
+		rows.Scan(&c, &reclouter, &pic)
+		items = append(items, TopUser{c, reclouter, pic})
+	}
+	return items
+}
+func QuerySqliteTopDiamondGivers(username, limit string) []TopUser {
+	items := []TopUser{}
+	sdb := database.OpenSqliteDB("user_sqlites/" + username)
+	defer sdb.Close()
+
+	rows, err := sdb.Query("select count(1) as c, u.username, u.pic from diamonds d, users u where d.sender = u.pub58 group by u.username order by c desc limit " + limit)
+	if err != nil {
+		fmt.Println(err)
+		return items
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var c string
+		var giver string
+		var pic string
+		rows.Scan(&c, &giver, &pic)
+		items = append(items, TopUser{c, giver, pic})
+	}
+	return items
+}
 func QuerySqlitePosts(term string) {
 	sdb := database.OpenSqliteDefaultDB()
 	defer sdb.Close()
@@ -112,34 +181,6 @@ where u1.pub58 = uf.followee and
 		line := fmt.Sprintf(" n%d -> n%d;\n", follower_id-1, followee_id-1)
 		f.Write([]byte(line))
 		i++
-	}
-}
-func QuerySqliteLikesForAuthor(authorUsername string) {
-	db := database.OpenSqliteDefaultDB()
-	defer db.Close()
-	sql := `SELECT count(1) as c, u.username 
-            FROM likes l, users u 
-					 WHERE u.pub58 = l.liker AND 
-					       l.hash in (
-							SELECT p.hash 
-							  FROM posts p, users u
-						  	WHERE p.author=u.pub58 AND
-								      u.username = '%s'
-			     	) 
-					GROUP BY u.username 
-					ORDER BY c desc`
-	rows, err := db.Query(fmt.Sprintf(sql, authorUsername))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var count int64
-		var username string
-		rows.Scan(&count, &username)
-		fmt.Printf("% 10d %20s\n", count, username)
 	}
 }
 func SearchSqliteUsername(s string) string {

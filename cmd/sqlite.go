@@ -16,7 +16,6 @@ func PrintSqliteHelp() {
 	fmt.Println("  clout sqlite fill           # --dir=/path/to/badgerdb")
 	fmt.Println("  clout sqlite graph          # produce clout.gv file")
 	fmt.Println("  clout sqlite query          # --term=foo")
-	fmt.Println("  clout sqlite likes          # --username=foo")
 	fmt.Println("")
 }
 func HandleSqlite() {
@@ -43,8 +42,6 @@ func HandleSqlite() {
 		cloutcli.ImportFromBadgerToSqlite(dir)
 	} else if command == "graph" {
 		ProduceCloutGV()
-	} else if command == "likes" {
-		SortUsersByNumberLikesToYourPosts()
 	} else if command == "query" {
 		term := argMap["term"]
 		table := argMap["table"]
@@ -88,13 +85,4 @@ func ProduceCloutGV() {
 	f.Write([]byte("}\n"))
 	fmt.Println("done")
 	f.Close()
-}
-
-func SortUsersByNumberLikesToYourPosts() {
-	username := argMap["username"]
-	if username == "" {
-		fmt.Println("run with --username=foo")
-		return
-	}
-	cloutcli.QuerySqliteLikesForAuthor(username)
 }
