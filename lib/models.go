@@ -103,3 +103,13 @@ type Rate struct {
 	NanosSold                       int64
 	USDCentsPerBitcoinExchangeRate  int64
 }
+
+type HodlersWrap struct {
+	Hodlers []Hodler
+}
+
+type Hodler struct {
+	HODLerPublicKeyBase58Check string
+	BalanceNanos               int64
+	ProfileEntryResponse       ProfileEntryResponse
+}

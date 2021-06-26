@@ -16,21 +16,21 @@ func GetNumFollowers(pub58, username string) int64 {
 	return pktpe.NumFollowers
 }
 
-func LoopThruAllFollowing(pub58, username string, limit int) []lib.ProfileEntryResponse {
+func LoopThruAllFollowing(pub58, username string, limit int) []string {
 	last := ""
 	js := network.GetFollowsStateless(pub58, username, last)
 	var pktpe lib.PublicKeyToProfileEntry
 	json.Unmarshal([]byte(js), &pktpe)
 	NumFollowers := pktpe.NumFollowers
 	total := map[string]bool{}
-	bigList := []lib.ProfileEntryResponse{}
+	bigList := []string{}
 	fmt.Println("Getting all", pktpe.NumFollowers, "...")
 	for {
 		for key, v := range pktpe.PublicKeyToProfileEntry {
 			last = key
 			if total[v.Username] == false {
 				total[v.Username] = true
-				bigList = append(bigList, v)
+				bigList = append(bigList, v.Username)
 			}
 		}
 		if len(bigList) >= limit && limit != 0 {

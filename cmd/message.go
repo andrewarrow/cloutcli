@@ -13,7 +13,7 @@ import (
 
 func PrintMessageHelp() {
 	fmt.Println("")
-	fmt.Println("  clout message bulk           # --to=allfollowers [--text=foo]")
+	fmt.Println("  clout message bulk           # --to=followers [--text=foo]")
 	fmt.Println("  clout message inbox          # --filter=myhodlers")
 	fmt.Println("  clout message new            # --to=username [--text=foo]")
 	fmt.Println("  clout message reply          # --id=foo [--text=foo]")
@@ -48,13 +48,16 @@ func MessageBulk() {
 		text = files.ReadFromIn()
 	}
 
+	me := cloutcli.Pub58ToUser(pub58)
 	bulkList := []string{}
-	if to == "allfollowers" {
-		me := cloutcli.Pub58ToUser(pub58)
-		items := cloutcli.LoopThruAllFollowing(pub58, me.ProfileEntryResponse.Username, 0)
-		for _, item := range items {
-			bulkList = append(bulkList, item.Username)
-		}
+	var items []string
+	if to == "followers" {
+		items = cloutcli.LoopThruAllFollowing(pub58, me.ProfileEntryResponse.Username, 0)
+	} else if to == "hodlers" {
+		items = cloutcli.UsernamesOfHodlers(me.ProfileEntryResponse.Username)
+	}
+	for _, item := range items {
+		bulkList = append(bulkList, item)
 	}
 
 	for _, username := range bulkList {
