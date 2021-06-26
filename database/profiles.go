@@ -6,6 +6,7 @@ import (
 
 	"github.com/andrewarrow/cloutcli/lib"
 	"github.com/dgraph-io/badger/v3"
+	"strings"
 )
 
 func EnumerateProfiles(db *badger.DB, c *chan *lib.ProfileEntry) {
@@ -72,7 +73,7 @@ func LookupUsername(db *badger.DB, pkid []byte) string {
 	})
 
 	if err == nil {
-		return username
+		return strings.ToLower(username)
 	}
 
 	return "404"

@@ -40,13 +40,14 @@ func InsertProfileSqlite(db *sql.DB, profile *lib.ProfileEntry) {
 	pub58 := base58.Encode(profile.PublicKey)
 	username := string(profile.Username)
 	bio := string(profile.Description)
+	pic := base58.Encode(profile.ProfilePic)
 
-	s := `insert into users (bio, username, pub58, created_at) values (?, ?, ?, ?)`
+	s := `insert into users (pic, bio, username, pub58, created_at) values (?, ?, ?, ?, ?)`
 	thing, e := tx.Prepare(s)
 	if e != nil {
 		fmt.Println(e)
 	}
-	_, e = thing.Exec(bio, username, pub58, time.Now())
+	_, e = thing.Exec(pic, bio, username, pub58, time.Now())
 	if e != nil {
 		fmt.Println(e)
 	}

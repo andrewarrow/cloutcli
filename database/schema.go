@@ -7,13 +7,16 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func OpenSqliteDB() *sql.DB {
-	db, err := sql.Open("sqlite3", "clout.db")
+func OpenSqliteDB(fullpath string) *sql.DB {
+	db, err := sql.Open("sqlite3", fullpath)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 	return db
+}
+func OpenSqliteDefaultDB() *sql.DB {
+	return OpenSqliteDB("clout.db")
 }
 
 func CreateSchema(sdb *sql.DB) {
@@ -26,7 +29,7 @@ CREATE UNIQUE INDEX posts_hash_idx
 CREATE INDEX posts_username_idx
   ON posts (author);
 
-create table users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, bio text, username text, pub58 text, created_at datetime);
+create table users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, pic text, bio text, username text, pub58 text, created_at datetime);
 
 CREATE UNIQUE INDEX users_idx
   ON users (pub58);
