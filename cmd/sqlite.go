@@ -8,6 +8,7 @@ import (
 
 	"github.com/andrewarrow/cloutcli"
 	"github.com/andrewarrow/cloutcli/database"
+	"github.com/btcsuite/btcutil/base58"
 	"github.com/dgraph-io/badger/v3"
 )
 
@@ -29,9 +30,13 @@ func HandleSqlite() {
 
 		if argMap["stats"] != "" {
 
+			pub58 := cloutcli.UsernameToPub58(argMap["username"])
+			decoded := base58.Decode(pub58)
+			goal := decoded[3 : len(decoded)-4]
+
 			db, _ := badger.Open(badger.DefaultOptions(dir))
 			defer db.Close()
-			database.PostsByAuthor(db, argMap["username"])
+			database.PostsByAuthor(db, argMap["username"], goal)
 			return
 		}
 

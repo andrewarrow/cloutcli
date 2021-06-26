@@ -49,7 +49,7 @@ func main() {
 		pub58 := cloutcli.UsernameToPub58(argMap["username"])
 		fmt.Println(pub58)
 		decoded := base58.Decode(pub58)
-		fmt.Println(decoded)
+		fmt.Println(decoded[3 : len(decoded)-4])
 	}
 
 }

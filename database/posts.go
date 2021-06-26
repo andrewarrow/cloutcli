@@ -11,51 +11,16 @@ import (
 	"github.com/dgraph-io/badger/v3"
 )
 
-func PostsByAuthor(db *badger.DB, author string) {
+func PostsByAuthor(db *badger.DB, author string, goal []byte) {
 
-	prefix := []byte{17}
-
-	bigMap := map[string]string{}
-	db.View(func(txn *badger.Txn) error {
-		opts := badger.DefaultIteratorOptions
-		it := txn.NewIterator(opts)
-		defer it.Close()
-
-		i := 0
-		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
-			if i%1000 == 0 {
-				fmt.Println("iteration", i)
-			}
-			val, _ := it.Item().ValueCopy(nil)
-
-			post := &lib.PostEntry{}
-			gob.NewDecoder(bytes.NewReader(val)).Decode(post)
-
-			bigMapKey := base58.Encode(post.PosterPublicKey)
-			if bigMap[bigMapKey] == "" {
-				bigMap[bigMapKey] = LookupUsername(db, post.PosterPublicKey)
-			}
-
-			i++
-		}
-		return nil
-	})
-
-	fmt.Println("bigMap size", len(bigMap))
-
-	for k, v := range bigMap {
-		fmt.Println("bigMap On", v)
-		sdb := OpenSqliteDB("user_sqlites/" + v)
-		CreateSchema(sdb)
-		HandleGatherLikesRecloutsDiamonds(sdb, db, k)
-	}
-
+	sdb := OpenSqliteDB("user_sqlites/" + author + ".db")
+	CreateSchema(sdb)
+	HandleGatherLikesRecloutsDiamonds(sdb, db, goal)
 }
 
-func HandleGatherLikesRecloutsDiamonds(sdb *sql.DB, db *badger.DB, author string) {
+func HandleGatherLikesRecloutsDiamonds(sdb *sql.DB, db *badger.DB, goal []byte) {
 
 	prefix := []byte{17}
-	goal := base58.Decode(author)
 	postMap := map[string]bool{}
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
