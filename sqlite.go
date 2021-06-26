@@ -9,7 +9,7 @@ import (
 )
 
 func QuerySqlitePosts(term string) {
-	sdb := database.OpenSqliteDB()
+	sdb := database.OpenSqliteDefaultDB()
 	defer sdb.Close()
 
 	rows, err := sdb.Query("select body from posts where body like '%" + term + "%'")
@@ -26,7 +26,7 @@ func QuerySqlitePosts(term string) {
 	}
 }
 func QuerySqliteUsers(s string) {
-	db := database.OpenSqliteDB()
+	db := database.OpenSqliteDefaultDB()
 	defer db.Close()
 	rows, err := db.Query("select username,bio from users where (username like '%" + s + "%') or (bio like '%" + s + "%')")
 	if err != nil {
@@ -44,7 +44,7 @@ func QuerySqliteUsers(s string) {
 }
 func QuerySqliteFollow(tab, s, degrees string) {
 	pub58 := SearchSqliteUsername(s)
-	db := database.OpenSqliteDB()
+	db := database.OpenSqliteDefaultDB()
 	defer db.Close()
 	rows, err := db.Query("select follower from user_follower where followee = '" + pub58 + "'")
 	if err != nil {
@@ -68,7 +68,7 @@ func QuerySqliteFollow(tab, s, degrees string) {
 	}
 }
 func QuerySqliteNodesInOrder(f *os.File) {
-	db := database.OpenSqliteDB()
+	db := database.OpenSqliteDefaultDB()
 	defer db.Close()
 	rows, err := db.Query("select username from users order by user_id")
 	if err != nil {
@@ -87,7 +87,7 @@ func QuerySqliteNodesInOrder(f *os.File) {
 	}
 }
 func QuerySqliteNodeConnections(f *os.File) {
-	db := database.OpenSqliteDB()
+	db := database.OpenSqliteDefaultDB()
 	defer db.Close()
 	sql := `select uf.followee, u1.user_id, uf.follower, u2.user_id 
   from user_follower uf,
@@ -115,7 +115,7 @@ where u1.pub58 = uf.followee and
 	}
 }
 func QuerySqliteLikesForAuthor(authorUsername string) {
-	db := database.OpenSqliteDB()
+	db := database.OpenSqliteDefaultDB()
 	defer db.Close()
 	sql := `SELECT count(1) as c, u.username 
             FROM likes l, users u 
@@ -143,7 +143,7 @@ func QuerySqliteLikesForAuthor(authorUsername string) {
 	}
 }
 func SearchSqliteUsername(s string) string {
-	db := database.OpenSqliteDB()
+	db := database.OpenSqliteDefaultDB()
 	defer db.Close()
 	rows, err := db.Query("select pub58 from users where username='" + s + "'")
 	if err != nil {
@@ -161,7 +161,7 @@ func SearchSqliteUsername(s string) string {
 	return ""
 }
 func SearchSqlitePub58(s string) string {
-	db := database.OpenSqliteDB()
+	db := database.OpenSqliteDefaultDB()
 	defer db.Close()
 	rows, err := db.Query("select username from users where pub58='" + s + "'")
 	if err != nil {

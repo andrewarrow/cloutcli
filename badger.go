@@ -39,7 +39,7 @@ func ImportFromBadgerToSqlite(dir string) error {
 	fmt.Println(okList)
 	go database.EnumerateAll(okList, Testing, db, &entryChan)
 
-	sdb := database.OpenSqliteDB()
+	sdb := database.OpenSqliteDefaultDB()
 	database.CreateSchema(sdb)
 	defer sdb.Close()
 

@@ -7,13 +7,16 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func OpenSqliteDB() *sql.DB {
-	db, err := sql.Open("sqlite3", "clout.db")
+func OpenSqliteDB(fullpath string) *sql.DB {
+	db, err := sql.Open("sqlite3", fullpath)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 	return db
+}
+func OpenSqliteDefaultDB() *sql.DB {
+	return OpenSqliteDB("clout.db")
 }
 
 func CreateSchema(sdb *sql.DB) {

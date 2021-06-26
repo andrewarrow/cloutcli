@@ -11,12 +11,49 @@ import (
 	"github.com/dgraph-io/badger/v3"
 )
 
-func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
+func PostsByAuthor(db *badger.DB, author string) {
 
-	postMap := map[string]bool{}
 	prefix := []byte{17}
-	goal := UsernameToPub(db, author)
-	//prefix = append(prefix, UsernameToPub(db, author)...)
+
+	bigMap := map[string]bool{}
+	db.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		it := txn.NewIterator(opts)
+		defer it.Close()
+
+		i := 0
+		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			if i%1000 == 0 {
+				fmt.Println("iteration", i)
+			}
+			val, _ := it.Item().ValueCopy(nil)
+
+			post := &lib.PostEntry{}
+			gob.NewDecoder(bytes.NewReader(val)).Decode(post)
+
+			bigMap[base58.Encode(post.PosterPublicKey)] = true
+
+			i++
+		}
+		return nil
+	})
+
+	fmt.Println("bigMap size", len(bigMap))
+
+	for k, _ := range bigMap {
+		fmt.Println("bigMap On", k)
+		sdb := OpenSqliteDB("user_sqlites/" + k)
+		CreateSchema(sdb)
+		HandleGatherLikesRecloutsDiamonds(sdb, db, k)
+	}
+
+}
+
+func HandleGatherLikesRecloutsDiamonds(sdb *sql.DB, db *badger.DB, author string) {
+
+	prefix := []byte{17}
+	goal := base58.Decode(author)
+	postMap := map[string]bool{}
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
 		it := txn.NewIterator(opts)
@@ -127,6 +164,7 @@ func PostsByAuthor(sdb *sql.DB, db *badger.DB, author string) {
 		return nil
 	})
 }
+
 func EnumeratePosts(db *badger.DB, c *chan *lib.PostEntry) {
 
 	db.View(func(txn *badger.Txn) error {

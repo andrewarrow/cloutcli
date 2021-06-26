@@ -32,10 +32,7 @@ func HandleSqlite() {
 
 			db, _ := badger.Open(badger.DefaultOptions(dir))
 			defer db.Close()
-			sdb := database.OpenSqliteDB()
-			database.CreateSchema(sdb)
-			defer sdb.Close()
-			database.PostsByAuthor(sdb, db, argMap["username"])
+			database.PostsByAuthor(db, argMap["username"])
 			return
 		}
 
