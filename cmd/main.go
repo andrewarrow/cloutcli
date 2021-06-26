@@ -6,6 +6,9 @@ import (
 	"math/rand"
 	"os"
 	"time"
+
+	"github.com/andrewarrow/cloutcli"
+	"github.com/btcsuite/btcutil/base58"
 )
 
 func PrintHelp() {
@@ -42,6 +45,11 @@ func main() {
 		HandleSell()
 	} else if command == "sqlite" {
 		HandleSqlite()
+	} else if command == "username" {
+		pub58 := cloutcli.UsernameToPub58(argMap["username"])
+		fmt.Println(pub58)
+		decoded := base58.Decode(pub58)
+		fmt.Println(decoded)
 	}
 
 }
