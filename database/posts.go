@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/gob"
 	"fmt"
+	"os"
 
 	"github.com/andrewarrow/cloutcli/lib"
 	"github.com/btcsuite/btcutil/base58"
@@ -17,7 +18,9 @@ func PostsByAuthor(db *badger.DB, authors, pub58s []string) {
 	goalToUsername := map[string]string{}
 
 	for i, author := range authors {
-		sdb := OpenSqliteDB("user_sqlites/" + author + ".db")
+		filename := "user_sqlites/" + author + ".db"
+		os.Remove(filename)
+		sdb := OpenSqliteDB(filename)
 		CreateSchema(sdb)
 		authorToSdb[author] = sdb
 		decoded := base58.Decode(pub58s[i])
@@ -47,6 +50,7 @@ func HandleGatherLikesRecloutsDiamonds(sdbMap map[string]*sql.DB, db *badger.DB,
 
 		i := 0
 		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			i++
 			if i%1000 == 0 {
 				fmt.Println("iteration", i)
 			}
@@ -60,8 +64,6 @@ func HandleGatherLikesRecloutsDiamonds(sdbMap map[string]*sql.DB, db *badger.DB,
 				author := goalMap[compare]
 				postMap[author][base58.Encode(post.PostHash.Bytes())] = true
 			}
-
-			i++
 		}
 		return nil
 	})
@@ -73,7 +75,12 @@ func HandleGatherLikesRecloutsDiamonds(sdbMap map[string]*sql.DB, db *badger.DB,
 		it := txn.NewIterator(opts)
 		defer it.Close()
 
+		i := 0
 		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			i++
+			if i%1000 == 0 {
+				fmt.Println("like iteration", i)
+			}
 			key := it.Item().Key()
 			le := &lib.LikeEntry{}
 			le.LikerPubKey = key[1:34]
@@ -96,7 +103,12 @@ func HandleGatherLikesRecloutsDiamonds(sdbMap map[string]*sql.DB, db *badger.DB,
 		it := txn.NewIterator(opts)
 		defer it.Close()
 
+		i := 0
 		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			i++
+			if i%1000 == 0 {
+				fmt.Println("reclout iteration", i)
+			}
 			val, _ := it.Item().ValueCopy(nil)
 			re := &lib.RecloutEntry{}
 			gob.NewDecoder(bytes.NewReader(val)).Decode(re)
@@ -119,7 +131,12 @@ func HandleGatherLikesRecloutsDiamonds(sdbMap map[string]*sql.DB, db *badger.DB,
 		it := txn.NewIterator(opts)
 		defer it.Close()
 
+		i := 0
 		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			i++
+			if i%1000 == 0 {
+				fmt.Println("diamond iteration", i)
+			}
 			val, _ := it.Item().ValueCopy(nil)
 			de := &lib.DiamondEntry{}
 			gob.NewDecoder(bytes.NewReader(val)).Decode(de)
@@ -144,6 +161,10 @@ func HandleGatherLikesRecloutsDiamonds(sdbMap map[string]*sql.DB, db *badger.DB,
 
 		i := 0
 		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+			i++
+			if i%1000 == 0 {
+				fmt.Println("profile iteration", i)
+			}
 			key := it.Item().Key()
 			pub58 := base58.Encode(key[1:])
 			for k, sdb := range sdbMap {
@@ -152,11 +173,9 @@ func HandleGatherLikesRecloutsDiamonds(sdbMap map[string]*sql.DB, db *badger.DB,
 					profile := &lib.ProfileEntry{}
 					gob.NewDecoder(bytes.NewReader(val)).Decode(profile)
 					InsertProfileSqlite(sdb, profile)
-					i++
 				}
 			}
 		}
-		fmt.Println("i", i)
 		return nil
 	})
 }
