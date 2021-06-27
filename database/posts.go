@@ -78,8 +78,9 @@ func HandleGatherLikesRecloutsDiamonds(sdbMap map[string]*sql.DB, db *badger.DB,
 			le := &lib.LikeEntry{}
 			le.LikerPubKey = key[1:34]
 			le.LikedPostHash = key[34:]
+			base58LikedPostHash := base58.Encode(le.LikedPostHash)
 			for k, v := range postMap {
-				if v[base58.Encode(le.LikedPostHash)] {
+				if v[base58LikedPostHash] {
 					likeMap[k][base58.Encode(le.LikerPubKey)] = true
 					InsertLikeSqlite(sdbMap[k], le)
 				}
@@ -100,8 +101,9 @@ func HandleGatherLikesRecloutsDiamonds(sdbMap map[string]*sql.DB, db *badger.DB,
 			re := &lib.RecloutEntry{}
 			gob.NewDecoder(bytes.NewReader(val)).Decode(re)
 
+			base58RecloutedPostHash := base58.Encode(re.RecloutedPostHash.Bytes())
 			for k, v := range postMap {
-				if v[base58.Encode(re.RecloutedPostHash.Bytes())] {
+				if v[base58RecloutedPostHash] {
 					recloutMap[k][base58.Encode(re.ReclouterPubKey)] = true
 					InsertRecloutSqlite(sdbMap[k], re)
 				}
@@ -122,8 +124,9 @@ func HandleGatherLikesRecloutsDiamonds(sdbMap map[string]*sql.DB, db *badger.DB,
 			de := &lib.DiamondEntry{}
 			gob.NewDecoder(bytes.NewReader(val)).Decode(de)
 
+			base58DiamondPostHash := base58.Encode(de.DiamondPostHash.Bytes())
 			for k, v := range postMap {
-				if v[base58.Encode(de.DiamondPostHash.Bytes())] {
+				if v[base58DiamondPostHash] {
 					diamondMap[k][base58.Encode(de.SenderPKID[:])] = true
 					InsertDiamondSqlite(sdbMap[k], de)
 				}
