@@ -11,17 +11,35 @@ import (
 	"github.com/dgraph-io/badger/v3"
 )
 
-func PostsByAuthor(db *badger.DB, author string, goal []byte) {
+func PostsByAuthor(db *badger.DB, authors, pub58s []string) {
 
-	sdb := OpenSqliteDB("user_sqlites/" + author + ".db")
-	CreateSchema(sdb)
-	HandleGatherLikesRecloutsDiamonds(sdb, db, goal)
+	authorToSdb := map[string]*sql.DB{}
+	goalToUsername := map[string]string{}
+
+	for i, author := range authors {
+		sdb := OpenSqliteDB("user_sqlites/" + author + ".db")
+		CreateSchema(sdb)
+		authorToSdb[author] = sdb
+		decoded := base58.Decode(pub58s[i])
+		goal := decoded[3 : len(decoded)-4]
+		goalToUsername[base58.Encode(goal)] = author
+	}
+	HandleGatherLikesRecloutsDiamonds(authorToSdb, db, goalToUsername)
 }
 
-func HandleGatherLikesRecloutsDiamonds(sdb *sql.DB, db *badger.DB, goal []byte) {
+func HandleGatherLikesRecloutsDiamonds(sdbMap map[string]*sql.DB, db *badger.DB, goalMap map[string]string) {
 
 	prefix := []byte{17}
-	postMap := map[string]bool{}
+	postMap := map[string]map[string]bool{}
+	likeMap := map[string]map[string]bool{}
+	recloutMap := map[string]map[string]bool{}
+	diamondMap := map[string]map[string]bool{}
+	for k, _ := range sdbMap {
+		postMap[k] = map[string]bool{}
+		likeMap[k] = map[string]bool{}
+		recloutMap[k] = map[string]bool{}
+		diamondMap[k] = map[string]bool{}
+	}
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
 		it := txn.NewIterator(opts)
@@ -37,8 +55,10 @@ func HandleGatherLikesRecloutsDiamonds(sdb *sql.DB, db *badger.DB, goal []byte) 
 			post := &lib.PostEntry{}
 			gob.NewDecoder(bytes.NewReader(val)).Decode(post)
 
-			if bytes.Compare(post.PosterPublicKey, goal) == 0 {
-				postMap[base58.Encode(post.PostHash.Bytes())] = true
+			compare := base58.Encode(post.PosterPublicKey)
+			if goalMap[compare] != "" {
+				author := goalMap[compare]
+				postMap[author][base58.Encode(post.PostHash.Bytes())] = true
 			}
 
 			i++
@@ -47,7 +67,6 @@ func HandleGatherLikesRecloutsDiamonds(sdb *sql.DB, db *badger.DB, goal []byte) 
 	})
 	fmt.Println("postMap", len(postMap))
 
-	likeMap := map[string]bool{}
 	prefix = []byte{30}
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
@@ -59,16 +78,17 @@ func HandleGatherLikesRecloutsDiamonds(sdb *sql.DB, db *badger.DB, goal []byte) 
 			le := &lib.LikeEntry{}
 			le.LikerPubKey = key[1:34]
 			le.LikedPostHash = key[34:]
-			if postMap[base58.Encode(le.LikedPostHash)] {
-				likeMap[base58.Encode(le.LikerPubKey)] = true
-				InsertLikeSqlite(sdb, le)
+			for k, v := range postMap {
+				if v[base58.Encode(le.LikedPostHash)] {
+					likeMap[k][base58.Encode(le.LikerPubKey)] = true
+					InsertLikeSqlite(sdbMap[k], le)
+				}
 			}
 		}
 		return nil
 	})
 	fmt.Println("likeMap", len(likeMap))
 
-	recloutMap := map[string]bool{}
 	prefix = []byte{39}
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
@@ -80,16 +100,17 @@ func HandleGatherLikesRecloutsDiamonds(sdb *sql.DB, db *badger.DB, goal []byte) 
 			re := &lib.RecloutEntry{}
 			gob.NewDecoder(bytes.NewReader(val)).Decode(re)
 
-			if postMap[base58.Encode(re.RecloutedPostHash.Bytes())] {
-				recloutMap[base58.Encode(re.ReclouterPubKey)] = true
-				InsertRecloutSqlite(sdb, re)
+			for k, v := range postMap {
+				if v[base58.Encode(re.RecloutedPostHash.Bytes())] {
+					recloutMap[k][base58.Encode(re.ReclouterPubKey)] = true
+					InsertRecloutSqlite(sdbMap[k], re)
+				}
 			}
 		}
 		return nil
 	})
 	fmt.Println("recloutMap", len(recloutMap))
 
-	diamondMap := map[string]bool{}
 	prefix = []byte{41}
 	db.View(func(txn *badger.Txn) error {
 		opts := badger.DefaultIteratorOptions
@@ -101,9 +122,11 @@ func HandleGatherLikesRecloutsDiamonds(sdb *sql.DB, db *badger.DB, goal []byte) 
 			de := &lib.DiamondEntry{}
 			gob.NewDecoder(bytes.NewReader(val)).Decode(de)
 
-			if postMap[base58.Encode(de.DiamondPostHash.Bytes())] {
-				diamondMap[base58.Encode(de.SenderPKID[:])] = true
-				InsertDiamondSqlite(sdb, de)
+			for k, v := range postMap {
+				if v[base58.Encode(de.DiamondPostHash.Bytes())] {
+					diamondMap[k][base58.Encode(de.SenderPKID[:])] = true
+					InsertDiamondSqlite(sdbMap[k], de)
+				}
 			}
 		}
 		return nil
@@ -120,12 +143,14 @@ func HandleGatherLikesRecloutsDiamonds(sdb *sql.DB, db *badger.DB, goal []byte) 
 		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
 			key := it.Item().Key()
 			pub58 := base58.Encode(key[1:])
-			if likeMap[pub58] || recloutMap[pub58] || diamondMap[pub58] {
-				val, _ := it.Item().ValueCopy(nil)
-				profile := &lib.ProfileEntry{}
-				gob.NewDecoder(bytes.NewReader(val)).Decode(profile)
-				InsertProfileSqlite(sdb, profile)
-				i++
+			for k, sdb := range sdbMap {
+				if likeMap[k][pub58] || recloutMap[k][pub58] || diamondMap[k][pub58] {
+					val, _ := it.Item().ValueCopy(nil)
+					profile := &lib.ProfileEntry{}
+					gob.NewDecoder(bytes.NewReader(val)).Decode(profile)
+					InsertProfileSqlite(sdb, profile)
+					i++
+				}
 			}
 		}
 		fmt.Println("i", i)
