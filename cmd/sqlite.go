@@ -51,28 +51,35 @@ func HandleSqlite() {
 	} else if command == "graph" {
 		ProduceCloutGV()
 	} else if command == "query" {
-		term := argMap["term"]
-		table := argMap["table"]
+		HandleSimpleQueries()
+	}
+}
 
-		degrees := argMap["degrees"]
-		if degrees == "" {
-			degrees = "2"
-		}
+func HandleSimpleQueries() {
+	if CheckForCloutDbFirst() == false {
+		return
+	}
+	term := argMap["term"]
+	table := argMap["table"]
 
-		if table == "" || table == "posts" || table == "post" {
-			cloutcli.QuerySqlitePosts(term)
-		} else if table == "users" || table == "user" {
-			cloutcli.QuerySqliteUsers(term)
-		} else if table == "follow" {
-			cloutcli.QuerySqliteFollow("", term, degrees)
-		}
+	degrees := argMap["degrees"]
+	if degrees == "" {
+		degrees = "2"
+	}
+
+	if table == "" || table == "posts" || table == "post" {
+		cloutcli.QuerySqlitePosts(term)
+	} else if table == "users" || table == "user" {
+		cloutcli.QuerySqliteUsers(term)
+	} else if table == "follow" {
+		cloutcli.QuerySqliteFollow("", term, degrees)
 	}
 }
 
 func DirCheck() string {
 	dir := argMap["dir"]
 	if dir == "" {
-		fmt.Println("run with --dir=/home/name/path/to/badgerdb")
+		fmt.Println("run with --dir=/path/to/badgerdb")
 		return ""
 	}
 	if strings.HasPrefix(dir, "~") {
@@ -82,7 +89,19 @@ func DirCheck() string {
 	return dir
 }
 
+func CheckForCloutDbFirst() bool {
+	_, err := os.Stat("clout.db")
+	if err != nil {
+		fmt.Println("run 'clout demo sqlite' first to create your sqlite db.")
+		return false
+	}
+	return true
+}
 func ProduceCloutGV() {
+	if CheckForCloutDbFirst() == false {
+		return
+	}
+
 	fmt.Println("creating clout.gv...")
 	f, _ := os.Create("clout.gv")
 	f.Write([]byte("digraph regexp {\n"))

@@ -30,6 +30,13 @@ func HandleDemo() {
 		}
 		cloutcli.PrintAllPostsFromBadger(dir)
 	} else if command == "search" {
+		HandleSimpleQueries()
 	} else if command == "sqlite" {
+		dir := DirCheck()
+		if dir == "" {
+			return
+		}
+		cloutcli.Tables = "post,profile,follow"
+		cloutcli.ImportFromBadgerToSqlite(dir)
 	}
 }
