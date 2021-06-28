@@ -14,6 +14,12 @@ func PrintDemoHelp() {
 	fmt.Println("  clout demo search      # search sqlite database")
 	fmt.Println("  clout demo sqlite      # place clouts into local sqlite database")
 	fmt.Println("")
+	fmt.Println("  search examples:")
+	fmt.Println("")
+	fmt.Println("  ./clout demo search --term=hi --table=users")
+	fmt.Println("  ./clout demo search --term=hi --table=posts")
+	fmt.Println("  ./clout demo search --term=username --table=follow --degrees=2")
+	fmt.Println("")
 }
 func HandleDemo() {
 	if len(os.Args) < 3 {
