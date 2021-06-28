@@ -12,7 +12,7 @@ func PrintDemoHelp() {
 	fmt.Println("  clout demo graph       # make clout.gv graph file")
 	fmt.Println("  clout demo posts       # print all clouts")
 	fmt.Println("  clout demo search      # search sqlite database")
-	fmt.Println("  clout demo sqlite      # place clouts into local sqlite database")
+	fmt.Println("  clout demo sqlite      # place data into local sqlite database")
 	fmt.Println("")
 	fmt.Println("  search examples:")
 	fmt.Println("")
