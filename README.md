@@ -6,10 +6,10 @@ library to make building things with bitclout easy
 ```
 cmd $ ./clout demo
 
-  clout demo graph       # make clout.gv graph file
-  clout demo posts       # print all clouts
-  clout demo search      # search sqlite database
-  clout demo sqlite      # place data into local sqlite database
+  clout demo visualizegraph  # make clout.gv graph file
+  clout demo printall        # print all clouts
+  clout demo search          # search sqlite database
+  clout demo sqlite          # place data into local sqlite database
 
   search examples:
 

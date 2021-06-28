@@ -9,10 +9,10 @@ import (
 
 func PrintDemoHelp() {
 	fmt.Println("")
-	fmt.Println("  clout demo graph       # make clout.gv graph file")
-	fmt.Println("  clout demo posts       # print all clouts")
-	fmt.Println("  clout demo search      # search sqlite database")
-	fmt.Println("  clout demo sqlite      # place data into local sqlite database")
+	fmt.Println("  clout demo visualizegraph  # make clout.gv graph file")
+	fmt.Println("  clout demo printall        # print all clouts")
+	fmt.Println("  clout demo search          # search sqlite database")
+	fmt.Println("  clout demo sqlite          # place data into local sqlite database")
 	fmt.Println("")
 	fmt.Println("  search examples:")
 	fmt.Println("")
@@ -27,9 +27,9 @@ func HandleDemo() {
 		return
 	}
 	command := os.Args[2]
-	if command == "graph" {
+	if command == "visualizegraph" {
 		ProduceCloutGV()
-	} else if command == "posts" {
+	} else if command == "printall" {
 		dir := DirCheck()
 		if dir == "" {
 			return
