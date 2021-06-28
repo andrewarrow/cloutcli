@@ -1,6 +1,25 @@
 # cloutcli
 library to make building things with bitclout easy
 
+# quick start demo
+
+```
+cmd $ ./clout demo
+
+  clout demo graph       # make clout.gv graph file
+  clout demo posts       # print all clouts
+  clout demo search      # search sqlite database
+  clout demo sqlite      # place data into local sqlite database
+
+  search examples:
+
+  ./clout demo search --term=hi --table=users
+  ./clout demo search --term=hi --table=posts
+  ./clout demo search --term=username --table=follow --degrees=2
+```
+
+# full menu
+
 ```
 cloutcli/cmd $ ./clout
 
