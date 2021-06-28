@@ -14,7 +14,7 @@ import (
 func PrintMessageHelp() {
 	fmt.Println("")
 	fmt.Println("  clout message bulk           # --to=followers [--text=foo]")
-	fmt.Println("  clout message inbox          # --filter=myhodlers")
+	fmt.Println("  clout message inbox          # --filter=hodlers")
 	fmt.Println("  clout message new            # --to=username [--text=foo]")
 	fmt.Println("  clout message reply          # --id=foo [--text=foo]")
 	fmt.Println("  clout message show           # --id=foo")
