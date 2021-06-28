@@ -14,6 +14,7 @@ import (
 func PrintHelp() {
 	fmt.Println("")
 	fmt.Println("  clout account               # list your various accounts")
+	fmt.Println("  clout demo                  # demo some core concepts")
 	fmt.Println("  clout ls                    # list global posts")
 	fmt.Println("  clout message               # send, send bulk, read")
 	fmt.Println("  clout mongo                 # query from mongodb")
@@ -35,6 +36,8 @@ func main() {
 	argMap = args.ToMap()
 
 	if command == "account" || command == "accounts" {
+	} else if command == "demo" {
+		HandleDemo()
 	} else if command == "ls" {
 		HandleLs()
 	} else if command == "message" || command == "messages" {
