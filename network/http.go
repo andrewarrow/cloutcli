@@ -9,8 +9,12 @@ import (
 	"time"
 )
 
+var NodeURL string
+
 func BaseUrl() string {
-	//return "http://hacknode.io/"
+	if NodeURL != "" {
+		return NodeURL
+	}
 	return "https://bitclout.com/"
 }
 
