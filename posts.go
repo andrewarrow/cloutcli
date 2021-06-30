@@ -15,13 +15,16 @@ func GlobalPosts() []lib.Post {
 
 	return ps.PostsFound
 }
-func FollowingFeedPosts(username string) []lib.Post {
-	pub58 := UsernameToPub58(username)
+func FollowingFeedPub58(pub58 string) []lib.Post {
 	js := network.GetPostsStateless(pub58, true)
 	var ps lib.PostsStateless
 	json.Unmarshal([]byte(js), &ps)
 
 	return ps.PostsFound
+}
+func FollowingFeedPosts(username string) []lib.Post {
+	pub58 := UsernameToPub58(username)
+	return FollowingFeedPub58(pub58)
 }
 
 func SimplePost(words, body string) string {
