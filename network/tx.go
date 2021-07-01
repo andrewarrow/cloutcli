@@ -10,6 +10,15 @@ import (
 	"github.com/btcsuite/btcd/btcec"
 )
 
+func SubmitTxWithAlreadySignedHex(signedHex string) string {
+	jsonString := `{"TransactionHex": "%s"}`
+
+	send := fmt.Sprintf(jsonString, signedHex)
+	jsonString = DoPost("api/v0/submit-transaction",
+		[]byte(send))
+	return jsonString
+}
+
 func SubmitTx(hexString string, priv *btcec.PrivateKey) string {
 	jsonString := `{"TransactionHex": "%s"}`
 	transactionBytes, _ := hex.DecodeString(hexString)
