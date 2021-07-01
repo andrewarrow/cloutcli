@@ -14,6 +14,7 @@ type Post struct {
 	TimestampNanos             int64
 	ProfileEntryResponse       ProfileEntryResponse
 	LikeCount                  int64
+	DiamondCount               uint64
 	Comments                   []Post
 	RecloutedPostEntryResponse *Post
 	CommentCount               int64
