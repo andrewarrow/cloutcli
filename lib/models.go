@@ -1,5 +1,9 @@
 package lib
 
+type PostStateless struct {
+	PostFound Post
+}
+
 type PostsStateless struct {
 	PostsFound []Post
 }

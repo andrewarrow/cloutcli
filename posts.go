@@ -26,6 +26,12 @@ func FollowingFeedPosts(username string) []lib.Post {
 	pub58 := UsernameToPub58(username)
 	return FollowingFeedPub58(pub58)
 }
+func SinglePost(postHex string) lib.Post {
+	js := network.GetSinglePost(DefaultPublicKey, postHex)
+	var ps lib.PostStateless
+	json.Unmarshal([]byte(js), &ps)
+	return ps.PostFound
+}
 
 func SimplePost(words, body string) string {
 	pub58, priv := keys.ComputeKeysFromSeed(words)
