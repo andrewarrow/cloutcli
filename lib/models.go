@@ -13,7 +13,7 @@ type Post struct {
 	PosterPublicKeyBase58Check string
 	ParentStakeID              string
 	Body                       string
-	PostExtraData              PostExtraData
+	PostExtraData              interface{}
 	ImageURLs                  []string
 	TimestampNanos             int64
 	ProfileEntryResponse       ProfileEntryResponse
@@ -23,10 +23,6 @@ type Post struct {
 	RecloutedPostEntryResponse *Post
 	CommentCount               int64
 	RecloutCount               int64
-}
-
-type PostExtraData struct {
-	EmbedVideoURL string
 }
 
 type ProfileEntryResponse struct {
