@@ -16,6 +16,7 @@ func PrintHelp() {
 	fmt.Println("  clout account               # list your various accounts")
 	fmt.Println("  clout demo                  # demo some core concepts")
 	fmt.Println("  clout ls                    # list global posts")
+	fmt.Println("  clout post                  # things you can do with posts")
 	fmt.Println("  clout message               # send, send bulk, read")
 	fmt.Println("  clout mongo                 # query from mongodb")
 	fmt.Println("  clout sell                  # sell coins")
@@ -44,6 +45,8 @@ func main() {
 		HandleMessage()
 	} else if command == "mongo" || command == "mongodb" {
 		HandleMongo()
+	} else if command == "post" || command == "posts" {
+		HandlePosts()
 	} else if command == "sell" {
 		HandleSell()
 	} else if command == "sqlite" {
