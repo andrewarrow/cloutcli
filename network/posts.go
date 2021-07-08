@@ -25,7 +25,7 @@ func SubmitPost(pub58, body, reply, imageURL string) string {
 }
 
 func GetSinglePost(pub58, postHex string) string {
-	jsonString := `{"PostHashHex":"%s","ReaderPublicKeyBase58Check":"%s","FetchParents":false,"CommentOffset":0,"CommentLimit":20,"AddGlobalFeedBool":false}`
+	jsonString := `{"PostHashHex":"%s","ReaderPublicKeyBase58Check":"%s","FetchParents":false,"CommentOffset":0,"CommentLimit":300,"AddGlobalFeedBool":false}`
 	sendString := fmt.Sprintf(jsonString, postHex, pub58)
 	jsonString = DoPost("api/v0/get-single-post",
 		[]byte(sendString))

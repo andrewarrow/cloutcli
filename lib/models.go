@@ -15,14 +15,15 @@ type Post struct {
 	Body                       string
 	PostExtraData              interface{}
 	ImageURLs                  []string
-	TimestampNanos             int64
+	TimestampNanos             uint64
 	ProfileEntryResponse       ProfileEntryResponse
-	LikeCount                  int64
+	LikeCount                  uint64
 	DiamondCount               uint64
 	Comments                   []Post
 	RecloutedPostEntryResponse *Post
-	CommentCount               int64
-	RecloutCount               int64
+	CommentCount               uint64
+	RecloutCount               uint64
+	QuoteRecloutCount          uint64
 }
 
 type ProfileEntryResponse struct {
