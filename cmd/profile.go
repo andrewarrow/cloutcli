@@ -28,7 +28,6 @@ func HandleProfiles() {
 func LookupProfile(pub58 string) {
 	user := cloutcli.Pub58ToUser(pub58)
 	username := user.ProfileEntryResponse.Username
-	fmt.Println(user)
 	fmt.Println("")
 	fmt.Println(username)
 	fmt.Println("")
