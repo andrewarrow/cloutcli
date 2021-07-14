@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 func WarnAboutWords() string {
@@ -13,7 +14,7 @@ func WarnAboutWords() string {
 		fmt.Println("cloutcli needs your private key i.e seed words")
 		fmt.Println("temporarily set an ENVIRONEMENT_VARIABLE named \"CLOUTCLI_SEED_WORDS\"")
 		fmt.Println("")
-		fmt.Println("don't just type export CLOUTCLI_SEED_WORDS=words from a bash prompt")
+		fmt.Println("don't just type export CLOUTCLI_SEED_WORDS=\"words\" from a bash prompt")
 		fmt.Println("that would go into your bash history")
 		fmt.Println("instead edit your .bash_profile or equivalent and place the")
 		fmt.Println("export command there and save the file.")
@@ -26,6 +27,15 @@ func WarnAboutWords() string {
 		fmt.Println("")
 		fmt.Println("close the hot terminal window(s) and take a deep breath.")
 		fmt.Println("but while your terminal is hot, run the command you need to run")
+		fmt.Println("")
+		return ""
+	}
+	tokens := strings.Split(words, " ")
+	if len(tokens) == 1 {
+		fmt.Println("")
+		fmt.Println("There are not enough words in your CLOUTCLI_SEED_WORDS variable.")
+		fmt.Println("")
+		fmt.Println("Make sure you placed the words inside quotes.")
 		fmt.Println("")
 		return ""
 	}
