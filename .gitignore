@@ -1,4 +1,5 @@
 go.sum
+.DS_Store
 clout.db-journal
 clout.db
 vendor
