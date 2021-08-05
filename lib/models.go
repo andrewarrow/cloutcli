@@ -24,6 +24,10 @@ type Post struct {
 	CommentCount               uint64
 	RecloutCount               uint64
 	QuoteRecloutCount          uint64
+	CreatorBasisPoints         uint64
+	StakeMultipleBasisPoints   uint64
+	IsHidden                   bool
+	ConfirmationBlockHeight    uint64
 }
 
 type ProfileEntryResponse struct {
